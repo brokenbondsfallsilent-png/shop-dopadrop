@@ -2,7 +2,7 @@ const policyRows = [
   {
     "_id": "delivery",
     "title": "Free shipping on orders $60 and over",
-    "body": "<p>We ship Australia-wide. Free standard shipping applies to orders of $60 AUD or more. Shipping charges for orders below $60 AUD are shown at checkout.</p><p>Orders are usually dispatched within 1 to 3 business days of payment. Standard delivery takes about 7 to 14 business days after dispatch.</p><p>These are estimates, not guarantees. Delays can happen because of couriers, customs, weather or supplier stock.</p>"
+    "body": "<p>We ship Australia-wide. Standard shipping is free on orders of $60 AUD or more. Orders below $60 AUD have a $7.95 AUD standard shipping charge, shown at checkout.</p><p>Orders are usually dispatched within 1 to 3 business days of payment. Standard delivery takes about 7 to 14 business days after dispatch.</p><p>These are estimates, not guarantees. Delays can happen because of couriers, customs, weather or supplier stock.</p>"
   },
   {
     "_id": "supplier",
