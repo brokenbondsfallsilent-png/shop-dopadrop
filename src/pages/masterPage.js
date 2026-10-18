@@ -15,7 +15,7 @@ $w.onReady(function () {
         } else if (text.includes('© 2035 by Visuelle')) {
             element.text = '© 2026 by Shop-DopaDrop. Built on Wix Studio.';
         } else if (text.includes('Get 15% off your first purchase') || text === 'Built for your brain. Free shipping Australia-wide.') {
-            element.text = 'Built for your brain. Free shipping Australia-wide.';
+            element.text = 'Built for your brain. Free shipping Australia-wide on orders $60 AUD and over.';
             element.customClassList.add('dopa-announcement');
         } else if (text === 'info@mysite.com' || text === 'dylan.thorne@alchemisecollectiveptyltd.com') {
             element.html = '<p><a href="mailto:dylan.thorne@alchemisecollectiveptyltd.com" style="color:#37e8ff;text-decoration:underline;overflow-wrap:anywhere">dylan.thorne@alchemisecollectiveptyltd.com</a></p>';
