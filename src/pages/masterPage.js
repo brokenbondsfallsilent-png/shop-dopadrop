@@ -17,6 +17,8 @@ $w.onReady(function () {
         } else if (text.includes('Get 15% off your first purchase') || text === 'Built for your brain. Free shipping Australia-wide.') {
             element.text = 'Built for your brain. Free shipping Australia-wide on orders $60 AUD and over.';
             element.customClassList.add('dopa-announcement');
+        } else if (text.includes('We ship Australia-wide. Standard shipping is free.')) {
+            element.html = element.html.replace('We ship Australia-wide. Standard shipping is free.', 'We ship Australia-wide. Standard shipping is free on orders of $60 AUD or more. Orders below $60 AUD have a $7.95 AUD standard shipping charge.');
         } else if (text === 'info@mysite.com' || text === 'dylan.thorne@alchemisecollectiveptyltd.com') {
             element.html = '<p><a href="mailto:dylan.thorne@alchemisecollectiveptyltd.com" style="color:#37e8ff;text-decoration:underline;overflow-wrap:anywhere">dylan.thorne@alchemisecollectiveptyltd.com</a></p>';
         } else if ( text === '123-456-7890' || text.includes('500 Terry Francine') || text === '/') {
