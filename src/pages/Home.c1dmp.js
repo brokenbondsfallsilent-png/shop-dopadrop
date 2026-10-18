@@ -43,7 +43,7 @@ $w.onReady(function () {
             return { type: 'SHOP_DOPA_CATALOG', products: [], collections: [], error: true };
         }
         const result = results[0].value;
-        const items = result.items;
+        const items = result.items.filter(product => product.visible !== false);
         const products = items.map(p => ({
             name: p.name,
             price: p.formattedDiscountedPrice || p.formattedPrice || '',
@@ -60,8 +60,8 @@ $w.onReady(function () {
         const amounts = items.map(p => p.discountedPrice ?? p.price).filter(p => typeof p === 'number' && p > 0);
         return {
             type: 'SHOP_DOPA_CATALOG', loaded: true, products, collections,
-            total: result.totalCount,
-            minPrice: result.totalCount === items.length && amounts.length
+            total: items.length,
+            minPrice: amounts.length
                 ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(Math.min(...amounts)) : ''
         };
     }
