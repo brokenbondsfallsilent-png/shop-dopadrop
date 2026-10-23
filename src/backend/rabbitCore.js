@@ -1,4 +1,4 @@
-import { TOTAL_BUTTONS } from './rabbitContent';
+import { HUNT_ROUTE, TOTAL_BUTTONS } from './rabbitContent';
 
 export function normaliseState(item = {}) {
     const foundIds = [...new Set((item.foundIds || []).map(Number).filter(id => Number.isInteger(id) && id >= 1 && id <= TOTAL_BUTTONS))].sort((a, b) => a - b);
@@ -15,11 +15,15 @@ export function normaliseState(item = {}) {
     };
 }
 
-export function addFind(item, buttonId) {
+export function addFind(item, buttonId, pagePath) {
     if (!Number.isInteger(buttonId) || buttonId < 1 || buttonId > TOTAL_BUTTONS) {
         throw new Error('UNKNOWN_BUTTON');
     }
     const state = normaliseState(item);
+    const expectedId = state.foundCount + 1;
+    const expectedPath = HUNT_ROUTE[expectedId - 1];
+    if (buttonId !== expectedId) throw new Error('HUNT_STEP_OUT_OF_SEQUENCE');
+    if (typeof pagePath === 'string' && pagePath !== expectedPath) throw new Error('WRONG_HUNT_PAGE');
     const isNew = !state.foundIds.includes(buttonId);
     if (isNew) state.foundIds.push(buttonId);
     state.foundIds.sort((a, b) => a - b);
@@ -32,6 +36,7 @@ export function addFind(item, buttonId) {
 
 export function publicState(item) {
     const state = normaliseState(item);
+    const nextId = state.foundCount + 1;
     return {
         foundIds: state.foundIds,
         found: state.foundCount,
@@ -39,6 +44,8 @@ export function publicState(item) {
         caveUnlocked: state.caveUnlocked,
         caveEntered: state.caveEntered,
         rewardStatus: state.rewardStatus,
+        nextButtonId: nextId <= TOTAL_BUTTONS ? nextId : null,
+        nextPage: nextId <= TOTAL_BUTTONS ? HUNT_ROUTE[nextId - 1] : null,
         forest: state.forestState,
         lootgrem: state.caveUnlocked ? state.lootgremState : null
     };

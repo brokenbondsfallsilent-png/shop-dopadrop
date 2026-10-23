@@ -2,6 +2,28 @@ export const TOTAL_BUTTONS = 50;
 export const REWARD_POINTS = 500;
 export const CAMPAIGN_START = '2026-10-30';
 
+// The hunt is a relay, not a single-page gallery. Each ordinal belongs to
+// exactly one destination page; the member may only claim the next ordinal
+// when the current page matches this route.
+export const HUNT_ROUTE = [
+    '/','/about','/category/all-products','/category/best-sellers','/gift-card',
+    '/blog','/contact','/category/desk-workspace-fidgets','/category/hand-fidgets-spinners',
+    '/category/sensory-rings-chains-wearables','/category/chew-oral-sensory',
+    '/category/tactile-textured-sensory','/category/weighted-deep-pressure',
+    '/category/visual-light-stimulation','/category/auditory-rhythm-tools',
+    '/category/focus-calm-tools','/category/stim-toys-squishies',
+    '/category/sensory-kits-bundles','/category/movement-balance','/category/puzzles-hands-on-play',
+    '/shipping-policy','/refund-policy','/privacy-policy','/terms-and-conditions',
+    '/accessibility-statement','/category/all-products','/about','/contact','/blog','/gift-card',
+    '/category/best-sellers','/category/desk-workspace-fidgets','/category/hand-fidgets-spinners',
+    '/category/sensory-rings-chains-wearables','/category/chew-oral-sensory',
+    '/category/tactile-textured-sensory','/category/weighted-deep-pressure',
+    '/category/visual-light-stimulation','/category/auditory-rhythm-tools',
+    '/category/focus-calm-tools','/category/stim-toys-squishies',
+    '/category/sensory-kits-bundles','/category/movement-balance','/category/puzzles-hands-on-play',
+    '/','/about','/category/all-products','/contact','/blog','/gift-card'
+];
+
 export const LOOTGREM_DIALOGUE = {
     welcome: {
         text: 'The fire crackles. A moss-covered creature watches you. “Fifty little secrets. And you found every one.”',
@@ -95,7 +117,14 @@ export const DAILY_CONTENT = RAW_DAYS.map((entry, index) => ({
 }));
 
 export function campaignDay(now = new Date(), start = CAMPAIGN_START) {
-    const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const sydneyParts = new Intl.DateTimeFormat('en-AU', {
+        timeZone: 'Australia/Sydney',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(now);
+    const part = (type) => Number(sydneyParts.find((item) => item.type === type)?.value);
+    const todayUtc = Date.UTC(part('year'), part('month') - 1, part('day'));
     const [year, month, day] = start.split('-').map(Number);
     const startUtc = Date.UTC(year, month - 1, day);
     return Math.max(0, Math.min(30, Math.floor((todayUtc - startUtc) / 86400000) + 1));

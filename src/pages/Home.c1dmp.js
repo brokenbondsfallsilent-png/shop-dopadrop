@@ -8,6 +8,10 @@ import {
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
     const view = $w('#html1');
+    const currentHuntPage = () => {
+        const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
+        return path.length ? '/' + path.join('/') : '/';
+    };
     ['#section3', '#section2'].forEach(id => $w(id).collapse());
     async function readAll(collection) {
         let page = await wixData.query(collection).limit(100).find();
@@ -93,7 +97,7 @@ $w.onReady(function () {
         if (data?.type === 'RABBIT_HOLE_REQUEST' && typeof data.requestId === 'string') {
             const actions = {
                 state: () => getHuntState(),
-                find: () => findButton(data.buttonId),
+                find: () => findButton(data.buttonId, currentHuntPage()),
                 cave: () => enterCave(),
                 dialogue: () => chooseLootgrem(data.node, data.option),
                 encounter: () => forestEncounter(data.characterId, data.actionId),

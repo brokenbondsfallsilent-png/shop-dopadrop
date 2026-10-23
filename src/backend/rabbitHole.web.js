@@ -51,10 +51,10 @@ export const getHuntState = webMethod(Permissions.SiteMember, async () => {
     return publicState(await load(id));
 });
 
-export const findButton = webMethod(Permissions.SiteMember, async (buttonId) => {
+export const findButton = webMethod(Permissions.SiteMember, async (buttonId, pagePath) => {
     const id = await memberId();
     const before = await load(id);
-    const { state, isNew } = addFind(before, Number(buttonId));
+    const { state, isNew } = addFind(before, Number(buttonId), pagePath);
     if (isNew) await save(state);
     return { newFind: isNew, ...publicState(state) };
 });
