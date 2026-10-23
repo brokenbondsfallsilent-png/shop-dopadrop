@@ -8,6 +8,7 @@ import {
     REWARD_POINTS, TOTAL_BUTTONS, campaignDay
 } from './rabbitContent';
 import { addFind, normaliseState, publicState } from './rabbitCore';
+import { recordDopaActivity } from './dopaProfiles';
 
 const COLLECTION = 'RabbitHuntMembers';
 const GLOBAL_COLLECTION = 'RabbitHuntGlobal';
@@ -63,11 +64,32 @@ export const getHuntState = webMethod(Permissions.SiteMember, async () => {
     return publicState(await load(id));
 });
 
+// Testing control: clear this member's hunt progress without touching the
+// global claimant ledger or enabling/issuing any reward.
+export const resetHuntState = webMethod(Permissions.SiteMember, async () => {
+    const id = await memberId();
+    const state = fresh(id);
+    await save(state);
+    return publicState(state);
+});
+
 export const findButton = webMethod(Permissions.SiteMember, async (buttonId, pagePath) => {
     const id = await memberId();
     const before = await load(id);
     const { state, isNew } = addFind(before, Number(buttonId), pagePath);
-    if (isNew) await save(state);
+    if (isNew) {
+        await save(state);
+        try {
+            await recordDopaActivity(id, {
+                questJoined: true,
+                hiddenButtonsFound: state.foundCount,
+                questCompleted: state.caveUnlocked
+            });
+        } catch (error) {
+            // A profile-sync issue must never invalidate an already-saved hunt find.
+            console.error('DopaVerse profile sync failed:', error);
+        }
+    }
     return { newFind: isNew, ...publicState(state) };
 });
 

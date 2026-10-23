@@ -3,7 +3,7 @@ import wixLocationFrontend from 'wix-location-frontend';
 import { authentication } from 'wix-members-frontend';
 import {
     claimReward, chooseLootgrem, enterCave, findButton, forestEncounter,
-    getDailyContent, getHuntState, solveDailyContent
+    getDailyContent, getHuntState, resetHuntState, solveDailyContent
 } from 'backend/rabbitHole.web';
 
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
@@ -15,7 +15,10 @@ $w.onReady(function () {
     const rabbitWidget = $w('#html2');
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
     // Cache-bust the homepage asset so Wix does not reuse the pre-HUD-removal copy.
-    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=c0e7a28';
+    // Force Wix's HTML component to load the current bridge-enabled build.
+    // The cache key is intentionally bumped whenever the embedded navigation
+    // contract changes so an older filesusr snapshot cannot mask the router.
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=c0e7a29';
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
         return path.length ? '/' + path.join('/') : '/';
@@ -105,6 +108,7 @@ $w.onReady(function () {
         if (data?.type === 'RABBIT_HOLE_REQUEST' && typeof data.requestId === 'string') {
             const actions = {
                 state: () => getHuntState(),
+                reset: () => resetHuntState(),
                 find: () => findButton(data.buttonId, currentHuntPage()),
                 cave: () => enterCave(),
                 dialogue: () => chooseLootgrem(data.node, data.option),
