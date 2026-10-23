@@ -21,21 +21,149 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "fallbackExclusionList": [\
     ],\
     "fallbackPool": [\
+      [\
+        "@babel/runtime",\
+        "npm:7.29.10"\
+      ],\
+      [\
+        "@wix/auto_sdk_embeds_custom-embeds",\
+        "npm:1.0.21"\
+      ],\
+      [\
+        "@wix/embeds",\
+        "npm:1.0.22"\
+      ],\
+      [\
+        "@wix/error-handler-types",\
+        "npm:1.20.0"\
+      ],\
+      [\
+        "@wix/monitoring-types",\
+        "npm:1.1.0"\
+      ],\
+      [\
+        "@wix/sdk-context",\
+        "npm:0.0.1"\
+      ],\
+      [\
+        "@wix/sdk-runtime",\
+        "npm:1.0.28"\
+      ],\
+      [\
+        "@wix/sdk-types",\
+        "npm:1.17.12"\
+      ],\
+      [\
+        "type-fest",\
+        "npm:4.41.0"\
+      ]\
     ],\
     "packageRegistryData": [\
       [null, [\
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@wix/embeds", "npm:1.0.22"]\
           ],\
           "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@babel/runtime", [\
+        ["npm:7.29.10", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@babel-runtime-npm-7.29.10-4ee4a4cc8c-8c0.zip/node_modules/@babel/runtime/",\
+          "packageDependencies": [\
+            ["@babel/runtime", "npm:7.29.10"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/auto_sdk_embeds_custom-embeds", [\
+        ["npm:1.0.21", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-auto_sdk_embeds_custom-embeds-npm-1.0.21-06b583790b-8c0.zip/node_modules/@wix/auto_sdk_embeds_custom-embeds/",\
+          "packageDependencies": [\
+            ["@wix/auto_sdk_embeds_custom-embeds", "npm:1.0.21"],\
+            ["@wix/sdk-runtime", "npm:1.0.28"],\
+            ["@wix/sdk-types", "npm:1.17.12"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/embeds", [\
+        ["npm:1.0.22", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-embeds-npm-1.0.22-268041f295-8c0.zip/node_modules/@wix/embeds/",\
+          "packageDependencies": [\
+            ["@wix/embeds", "npm:1.0.22"],\
+            ["@wix/auto_sdk_embeds_custom-embeds", "npm:1.0.21"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/error-handler-types", [\
+        ["npm:1.20.0", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-error-handler-types-npm-1.20.0-38cc55c375-8c0.zip/node_modules/@wix/error-handler-types/",\
+          "packageDependencies": [\
+            ["@wix/error-handler-types", "npm:1.20.0"],\
+            ["@babel/runtime", "npm:7.29.10"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/monitoring-types", [\
+        ["npm:1.1.0", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-monitoring-types-npm-1.1.0-87dcacbf8d-8c0.zip/node_modules/@wix/monitoring-types/",\
+          "packageDependencies": [\
+            ["@wix/monitoring-types", "npm:1.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/sdk-context", [\
+        ["npm:0.0.1", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-sdk-context-npm-0.0.1-0a19b890e4-8c0.zip/node_modules/@wix/sdk-context/",\
+          "packageDependencies": [\
+            ["@wix/sdk-context", "npm:0.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/sdk-runtime", [\
+        ["npm:1.0.28", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-sdk-runtime-npm-1.0.28-3e040b9d6e-8c0.zip/node_modules/@wix/sdk-runtime/",\
+          "packageDependencies": [\
+            ["@wix/sdk-runtime", "npm:1.0.28"],\
+            ["@wix/sdk-context", "npm:0.0.1"],\
+            ["@wix/sdk-types", "npm:1.17.12"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@wix/sdk-types", [\
+        ["npm:1.17.12", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/@wix-sdk-types-npm-1.17.12-d9efc58b4e-8c0.zip/node_modules/@wix/sdk-types/",\
+          "packageDependencies": [\
+            ["@wix/sdk-types", "npm:1.17.12"],\
+            ["@wix/error-handler-types", "npm:1.20.0"],\
+            ["@wix/monitoring-types", "npm:1.1.0"],\
+            ["type-fest", "npm:4.41.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["type-fest", [\
+        ["npm:4.41.0", {\
+          "packageLocation": "../dynamic-modules/yarn-cache/cache/type-fest-npm-4.41.0-31a6ce52d8-8c0.zip/node_modules/type-fest/",\
+          "packageDependencies": [\
+            ["type-fest", "npm:4.41.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["user-code", [\
         ["workspace:.", {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["user-code", "workspace:."]\
+            ["user-code", "workspace:."],\
+            ["@wix/embeds", "npm:1.0.22"]\
           ],\
           "linkType": "SOFT"\
         }]\
