@@ -72,8 +72,7 @@ function render(data={products:[],collections:[]}){
  if(data.minPrice)document.getElementById('minPrice').textContent=data.minPrice;
  if(data.loaded)document.getElementById('catalogStatus').textContent='';
 }
-const publicBase='https://www.shop--dopadrop.com.au';
-function setRouteLinks(){document.querySelectorAll('[data-route]').forEach(a=>{a.href=new URL(a.dataset.route.replace(/^\//,''),publicBase+'/').href;a.target='_top'})}
+function setRouteLinks(){document.querySelectorAll('[data-route]').forEach(a=>{const route=a.dataset.route;a.href='#';a.removeAttribute('target');a.onclick=event=>{event.preventDefault();send({type:'SHOP_DOPA_NAVIGATE',path:route});return false}})}
 render();setRouteLinks();window.addEventListener('message',e=>{if(e.source!==parent||e.data?.type!=='SHOP_DOPA_CATALOG')return;render(e.data);setRouteLinks()});window.addEventListener('load',()=>send({type:'SHOP_DOPA_READY'}));
 </script><script>
 const rabbitPending=new Map();let rabbitState={foundIds:[],found:0,required:50,caveUnlocked:false};
