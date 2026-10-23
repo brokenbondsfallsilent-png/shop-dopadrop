@@ -24,6 +24,14 @@ test('the shared header owns the single gemstone launcher', () => {
     assert.doesNotMatch(source, /rabbitWidget\.collapse\(\)/);
 });
 
+test('the shared header hides only the duplicate announcement-strip account control', () => {
+    const source = read('src/pages/masterPage.js');
+
+    assert.match(source, /\$w\(['"]#comp-m00ruy093['"]\)/);
+    assert.match(source, /duplicateAccountControl\.collapse\(\)/);
+    assert.doesNotMatch(source, /\$w\(['"]#comp-mvl7duy5['"]\)/);
+});
+
 test('the Home embed suppresses its internal HUD so only the header gem is visible', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
 
