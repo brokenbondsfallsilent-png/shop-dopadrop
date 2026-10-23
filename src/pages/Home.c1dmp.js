@@ -28,7 +28,8 @@ $w.onReady(function () {
     view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=c0e7a29';
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
-        return path.length ? '/' + path.join('/') : '/';
+        return !path.length || (path.length === 1 && path[0].toLowerCase() === 'home')
+            ? '/' : '/' + path.join('/');
     };
     ['#section3', '#section2'].forEach(id => $w(id).collapse());
     async function readAll(collection) {

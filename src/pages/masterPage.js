@@ -38,7 +38,8 @@ $w.onReady(function () {
     if (!hud) return;
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
-        return path.length ? '/' + path.join('/') : '/';
+        return !path.length || (path.length === 1 && path[0].toLowerCase() === 'home')
+            ? '/' : '/' + path.join('/');
     };
     if (typeof hud.onMessage !== 'function') return;
     hud.onMessage(async event => {
