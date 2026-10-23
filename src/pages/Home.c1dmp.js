@@ -1,5 +1,6 @@
 import wixData from 'wix-data';
 import wixLocationFrontend from 'wix-location-frontend';
+import { authentication } from 'wix-members-frontend';
 import {
     claimReward, chooseLootgrem, enterCave, findButton, forestEncounter,
     getDailyContent, getHuntState, solveDailyContent
@@ -108,6 +109,14 @@ $w.onReady(function () {
                 claim: () => claimReward()
             };
             if (actions[data.action]) await rabbitReply(data.requestId, actions[data.action]);
+        }
+        if (data?.type === 'RABBIT_LOGIN_REQUEST') {
+            try {
+                await authentication.promptLogin();
+                view.postMessage({ type: 'RABBIT_LOGIN_RESULT', ok: true });
+            } catch (error) {
+                view.postMessage({ type: 'RABBIT_LOGIN_RESULT', ok: false, error: error?.message || 'LOGIN_CANCELLED' });
+            }
         }
     });
 });
