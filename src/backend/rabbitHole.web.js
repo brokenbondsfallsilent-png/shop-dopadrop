@@ -34,7 +34,8 @@ function fresh(id) {
 
 async function load(id) {
     try {
-        return normaliseState(await wixData.get(COLLECTION, id, { suppressAuth: true }));
+        const item = await wixData.get(COLLECTION, id, { suppressAuth: true });
+        return item ? normaliseState(item) : fresh(id);
     } catch (error) {
         if (error?.code !== 'WD_ITEM_NOT_FOUND' && !String(error?.message || error).toLowerCase().includes('not found')) throw error;
         return fresh(id);
