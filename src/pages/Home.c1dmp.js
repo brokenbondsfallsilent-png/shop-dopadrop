@@ -8,6 +8,8 @@ import {
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
     const view = $w('#html1');
+    // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/';
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
         return path.length ? '/' + path.join('/') : '/';
