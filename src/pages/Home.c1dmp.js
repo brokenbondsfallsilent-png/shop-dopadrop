@@ -13,6 +13,7 @@ $w.onReady(function () {
     // Keep #html1 reserved for the homepage so the widget bridge never
     // accidentally targets or duplicates the homepage embed.
     const rabbitWidget = $w('#html2');
+    if (rabbitWidget) rabbitWidget.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/rabbit-widget.html?v=5528520';
     // Keep the gemstone launcher visible in the editor and preview. Some Wix
     // responsive breakpoints can leave an HTML component collapsed even though
     // its iframe content is still present in the accessibility tree.
@@ -155,6 +156,16 @@ $w.onReady(function () {
             forest: () => { wixLocationFrontend.to('/rabbit-hole-forest'); return Promise.resolve({ destination: '/rabbit-hole-forest' }); },
             'daily-clue': () => { wixLocationFrontend.to('/rabbit-hole-daily'); return Promise.resolve({ destination: '/rabbit-hole-daily' }); }
         };
+        if (data.action === 'reset-test') {
+            try {
+                if (!(await authentication.loggedIn())) throw new Error('MEMBER_LOGIN_REQUIRED');
+                const payload = await resetHuntState();
+                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: true, payload });
+            } catch (error) {
+                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: String(error?.message || error) });
+            }
+            return;
+        }
         if (!actions[data.action]) return;
         try {
             if (!(await authentication.loggedIn())) {
