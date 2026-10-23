@@ -10,6 +10,8 @@ import {
 import { addFind, normaliseState, publicState } from './rabbitCore';
 
 const COLLECTION = 'RabbitHuntMembers';
+const GLOBAL_COLLECTION = 'RabbitHuntGlobal';
+const GLOBAL_ID = 'global';
 const REWARD_ISSUANCE_ENABLED = false;
 const MANUAL_LOYALTY_APP_ID = '553c79f3-5625-4f38-b14b-ef7c0d1e87df';
 
@@ -45,6 +47,15 @@ async function load(id) {
 async function save(state) {
     state.lastSeenAt = new Date();
     return normaliseState(await wixData.save(COLLECTION, state, { suppressAuth: true }));
+}
+
+async function loadGlobal() {
+    try {
+        return await wixData.get(GLOBAL_COLLECTION, GLOBAL_ID, { suppressAuth: true });
+    } catch (error) {
+        if (error?.code !== 'WD_ITEM_NOT_FOUND' && !String(error?.message || error).toLowerCase().includes('not found')) throw error;
+        return { _id: GLOBAL_ID, claimantCount: 0, updatedAt: new Date() };
+    }
 }
 
 export const getHuntState = webMethod(Permissions.SiteMember, async () => {
@@ -165,5 +176,9 @@ export const claimReward = webMethod(Permissions.SiteMember, async () => {
     state.rewardTransactionId = result?.transactionId || result?.transaction_id || '';
     state.rewardIssuedAt = new Date();
     await save(state);
+    const global = await loadGlobal();
+    global.claimantCount = Number(global.claimantCount || 0) + 1;
+    global.updatedAt = new Date();
+    await wixData.save(GLOBAL_COLLECTION, global, { suppressAuth: true });
     return { status: 'awarded', alreadyAwarded: false, points: REWARD_POINTS, transactionId: state.rewardTransactionId };
 });
