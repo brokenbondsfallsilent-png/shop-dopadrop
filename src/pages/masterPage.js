@@ -1,5 +1,6 @@
 import wixLocationFrontend from 'wix-location-frontend';
 import { authentication } from 'wix-members-frontend';
+import { getHuntState, resetHuntState } from 'backend/rabbitHole.web';
 // Shared Shop-DopaDrop branding. Existing Wix store and member controls stay native.
 $w.onReady(function () {
     $w('#vectorImage2').src = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"14\" fill=\"#09090d\" stroke=\"#ff37bb\" stroke-width=\"2\"/><path d=\"M18 4 8 18h7l-1 10 10-15h-7z\" fill=\"#f5ff37\"/></svg>";
@@ -30,13 +31,40 @@ $w.onReady(function () {
     });
 });
 
-// Retire the legacy shared-header Rabbit Hole embed. The single interactive
-// hunt UI belongs to the Home embed, below the header.
+// The shared header is the one owner of the Rabbit Hole launcher. The Home
+// embed still contains the hunt, but its internal HUD is hidden so there is
+// exactly one visible control.
 $w.onReady(function () {
-    const legacyRabbitEmbed = $w('#html2');
-    if (legacyRabbitEmbed && typeof legacyRabbitEmbed.collapse === 'function') {
-        legacyRabbitEmbed.collapse();
-    }
+    const rabbitWidget = $w('#html2');
+    if (!rabbitWidget) return;
+    rabbitWidget.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/rabbit-widget.html?v=header-single-gem';
+    try {
+        if (typeof rabbitWidget.expand === 'function') rabbitWidget.expand();
+        if (typeof rabbitWidget.show === 'function') rabbitWidget.show();
+    } catch (_) { /* component visibility is controlled by the header layout */ }
+    if (typeof rabbitWidget.onMessage !== 'function') return;
+    rabbitWidget.onMessage(async event => {
+        const data = event.data || {};
+        if (data.type !== 'rabbit-hole-action') return;
+        const reply = (ok, payload, error) => rabbitWidget.postMessage({
+            type: 'RABBIT_WIDGET_RESULT', action: data.action, ok, payload, error
+        });
+        try {
+            if (data.action === 'sign-in') {
+                await authentication.promptLogin();
+                reply(true, await getHuntState());
+                return;
+            }
+            if (!(await authentication.loggedIn())) throw new Error('MEMBER_LOGIN_REQUIRED');
+            if (data.action === 'state') reply(true, await getHuntState());
+            else if (data.action === 'reset-test') reply(true, await resetHuntState());
+            else if (data.action === 'enter-cave') wixLocationFrontend.to('/rabbit-hole-cave');
+            else if (data.action === 'forest') wixLocationFrontend.to('/rabbit-hole-forest');
+            else if (data.action === 'daily-clue') wixLocationFrontend.to('/rabbit-hole-daily');
+        } catch (error) {
+            reply(false, undefined, String(error?.message || error));
+        }
+    });
 });
 
 // If a page contains a custom logout control, use Wix's member session API.

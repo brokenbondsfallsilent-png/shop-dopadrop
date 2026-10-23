@@ -6,7 +6,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
-test('Home owns the Rabbit Hole UI through html1 only', () => {
+test('Home uses html1 for the hunt and does not create a second header widget', () => {
     const source = read('src/pages/Home.c1dmp.js');
 
     assert.doesNotMatch(source, /\$w\(['"]#html2['"]\)/);
@@ -14,17 +14,19 @@ test('Home owns the Rabbit Hole UI through html1 only', () => {
     assert.match(source, /const view = \$w\(['"]#html1['"]\)/);
 });
 
-test('the legacy shared-header Rabbit Hole embed is collapsed', () => {
+test('the shared header owns the single gemstone launcher', () => {
     const source = read('src/pages/masterPage.js');
 
-    assert.match(source, /const legacyRabbitEmbed = \$w\(['"]#html2['"]\)/);
-    assert.match(source, /legacyRabbitEmbed\.collapse\(\)/);
-    assert.doesNotMatch(source, /RABBIT_HUD_(?:STATE|FIND)/);
+    assert.match(source, /const rabbitWidget = \$w\(['"]#html2['"]\)/);
+    assert.match(source, /rabbit-widget\.html\?v=/);
+    assert.match(source, /rabbitWidget\.expand\(\)/);
+    assert.match(source, /rabbitWidget\.show\(\)/);
+    assert.doesNotMatch(source, /rabbitWidget\.collapse\(\)/);
 });
 
-test('the Home embed retains its single internal Rabbit Hole HUD', () => {
+test('the Home embed suppresses its internal HUD so only the header gem is visible', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
 
-    assert.doesNotMatch(source, /querySelectorAll\(['"]\.rabbit-hud['"]\)\.forEach\(node=>node\.remove\(\)\)/);
+    assert.match(source, /\.rabbit-hud\{display:none!important\}/);
     assert.match(source, /installRabbitHunt\(\)/);
 });
