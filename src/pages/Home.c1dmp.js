@@ -14,7 +14,8 @@ $w.onReady(function () {
     // accidentally targets or duplicates the homepage embed.
     const rabbitWidget = $w('#html2');
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
-    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/';
+    // Cache-bust the homepage asset so Wix does not reuse the pre-HUD-removal copy.
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=c0e7a28';
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
         return path.length ? '/' + path.join('/') : '/';
