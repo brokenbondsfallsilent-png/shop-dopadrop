@@ -9,6 +9,10 @@ import {
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
     const view = $w('#html1');
+    // The standalone Rabbit Hole widget is the separate #html2 embed.
+    // Keep #html1 reserved for the homepage so the widget bridge never
+    // accidentally targets or duplicates the homepage embed.
+    const rabbitWidget = $w('#html2');
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
     view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/';
     const currentHuntPage = () => {
@@ -117,6 +121,36 @@ $w.onReady(function () {
             } catch (error) {
                 view.postMessage({ type: 'RABBIT_LOGIN_RESULT', ok: false, error: error?.message || 'LOGIN_CANCELLED' });
             }
+        }
+    });
+    rabbitWidget.onMessage(async event => {
+        const data = event.data || {};
+        if (data.type !== 'rabbit-hole-action') return;
+        const requestId = `widget-${Date.now()}`;
+        if (data.action === 'sign-in') {
+            try {
+                await authentication.promptLogin();
+                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', action: data.action, ok: true });
+            } catch (error) {
+                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', action: data.action, ok: false, error: error?.message || 'LOGIN_CANCELLED' });
+            }
+            return;
+        }
+        const actions = {
+            'enter-cave': () => enterCave(),
+            forest: () => forestEncounter('forest', 'observe'),
+            'daily-clue': () => getDailyContent()
+        };
+        if (!actions[data.action]) return;
+        try {
+            if (!(await authentication.loggedIn())) {
+                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: 'MEMBER_LOGIN_REQUIRED' });
+                return;
+            }
+            const payload = await actions[data.action]();
+            rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: true, payload });
+        } catch (error) {
+            rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: String(error?.message || error) });
         }
     });
 });
