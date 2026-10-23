@@ -1,10 +1,11 @@
-// API Reference: https://www.wix.com/velo/reference/api-overview/introduction
-// “Hello, World!” Example: https://learn-code.wix.com/en/article/hello-world
+import wixLocationFrontend from 'wix-location-frontend';
+import { getCollectionNaming } from 'public/dopaNaming';
 
 $w.onReady(function () {
-    // Write your JavaScript here
-
-    // To select an element by ID use: $w('#elementID')
-
-    // Click 'Preview' to run your code
+    const identity = getCollectionNaming(wixLocationFrontend.path);
+    if (!identity) return;
+    const heading = $w('Text').find(element => /<h1[ >]/i.test(element.html || ''));
+    if (!heading) return;
+    heading.html = `<h1>${identity.title}</h1><p>${identity.subtitle}</p>`;
+    heading.customClassList.add('dopa-neon-heading');
 });

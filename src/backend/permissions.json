@@ -6,6 +6,13 @@
         "siteMember": { "invoke": true },
         "anonymous": { "invoke": false }
       }
+    },
+    "dopaProfiles.web": {
+      "*": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      }
     }
   }
 }

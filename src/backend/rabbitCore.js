@@ -1,4 +1,4 @@
-import { HUNT_ROUTE, TOTAL_BUTTONS } from './rabbitContent';
+import { HUNT_ROUTE, HUNT_STAGES, TOTAL_BUTTONS } from './rabbitContent';
 
 export function normaliseState(item = {}) {
     const foundIds = [...new Set((item.foundIds || []).map(Number).filter(id => Number.isInteger(id) && id >= 1 && id <= TOTAL_BUTTONS))].sort((a, b) => a - b);
@@ -46,6 +46,7 @@ export function publicState(item) {
         rewardStatus: state.rewardStatus,
         nextButtonId: nextId <= TOTAL_BUTTONS ? nextId : null,
         nextPage: nextId <= TOTAL_BUTTONS ? HUNT_ROUTE[nextId - 1] : null,
+        stage: HUNT_STAGES.find(stage => nextId <= stage.threshold) || HUNT_STAGES.at(-1),
         forest: state.forestState,
         lootgrem: state.caveUnlocked ? state.lootgremState : null
     };
