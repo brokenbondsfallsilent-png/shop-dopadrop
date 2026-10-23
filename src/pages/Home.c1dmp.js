@@ -14,7 +14,7 @@ $w.onReady(function () {
     // Force Wix's HTML component to load the current bridge-enabled build.
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
-    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=button-relay-2f232dc';
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=c0e7a29';
     const currentHuntPage = () => {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
         return !path.length || (path.length === 1 && path[0].toLowerCase() === 'home')

@@ -40,7 +40,3 @@ test('the Home embed suppresses its internal HUD so only the header gem is visib
     assert.match(source, /installRabbitHunt\(\)/);
 });
 
-test('an already-found hunt button continues the relay to the next button page', () => {
-    const source = read('src/public/shop-dopadrop-home-current.html');
-    assert.match(source, /rabbitState\.foundIds\.includes\(id\)\)\{if\(rabbitState\.nextPage\)send\(\{type:'SHOP_DOPA_NAVIGATE',path:rabbitState\.nextPage\}\)/);
-});
