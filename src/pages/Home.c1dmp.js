@@ -1,5 +1,9 @@
 import wixData from 'wix-data';
 import wixLocationFrontend from 'wix-location-frontend';
+import {
+    claimReward, chooseLootgrem, enterCave, findButton, forestEncounter,
+    getDailyContent, getHuntState, solveDailyContent
+} from 'backend/rabbitHole.web';
 
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
@@ -65,6 +69,18 @@ $w.onReady(function () {
                 ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(Math.min(...amounts)) : ''
         };
     }
+    async function rabbitReply(requestId, action) {
+        try {
+            const payload = await action();
+            view.postMessage({ type: 'RABBIT_HOLE_RESULT', requestId, ok: true, payload });
+        } catch (error) {
+            const message = String(error?.message || error || 'Rabbit Hole request failed');
+            view.postMessage({
+                type: 'RABBIT_HOLE_RESULT', requestId, ok: false,
+                error: message.includes('MEMBER_LOGIN_REQUIRED') ? 'MEMBER_LOGIN_REQUIRED' : message
+            });
+        }
+    }
     view.onMessage(async event => {
         const data = event.data;
         if (data?.type === 'SHOP_DOPA_READY') {
@@ -73,6 +89,19 @@ $w.onReady(function () {
         }
         if (data?.type === 'SHOP_DOPA_NAVIGATE' && typeof data.path === 'string' && allowedPaths.has(data.path)) {
             wixLocationFrontend.to(data.path);
+        }
+        if (data?.type === 'RABBIT_HOLE_REQUEST' && typeof data.requestId === 'string') {
+            const actions = {
+                state: () => getHuntState(),
+                find: () => findButton(data.buttonId),
+                cave: () => enterCave(),
+                dialogue: () => chooseLootgrem(data.node, data.option),
+                encounter: () => forestEncounter(data.characterId, data.actionId),
+                daily: () => getDailyContent(),
+                solveDaily: () => solveDailyContent(data.day, data.answer),
+                claim: () => claimReward()
+            };
+            if (actions[data.action]) await rabbitReply(data.requestId, actions[data.action]);
         }
     });
 });
