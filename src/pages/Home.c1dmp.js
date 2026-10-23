@@ -13,6 +13,13 @@ $w.onReady(function () {
     // Keep #html1 reserved for the homepage so the widget bridge never
     // accidentally targets or duplicates the homepage embed.
     const rabbitWidget = $w('#html2');
+    // Keep the gemstone launcher visible in the editor and preview. Some Wix
+    // responsive breakpoints can leave an HTML component collapsed even though
+    // its iframe content is still present in the accessibility tree.
+    try {
+        if (rabbitWidget && typeof rabbitWidget.expand === 'function') rabbitWidget.expand();
+        if (rabbitWidget && typeof rabbitWidget.show === 'function') rabbitWidget.show();
+    } catch (_) { /* component visibility is controlled by the page layout */ }
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
     // Cache-bust the homepage asset so Wix does not reuse the pre-HUD-removal copy.
     // Force Wix's HTML component to load the current bridge-enabled build.
