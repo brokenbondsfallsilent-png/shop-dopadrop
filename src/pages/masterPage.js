@@ -1,4 +1,5 @@
 import wixLocationFrontend from 'wix-location-frontend';
+import { authentication } from 'wix-members-frontend';
 import { findButton, getHuntState } from 'backend/rabbitHole.web';
 // Shared Shop-DopaDrop branding. Existing Wix store and member controls stay native.
 $w.onReady(function () {
@@ -39,6 +40,7 @@ $w.onReady(function () {
         const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
         return path.length ? '/' + path.join('/') : '/';
     };
+    if (typeof hud.onMessage !== 'function') return;
     hud.onMessage(async event => {
         const data = event.data || {};
         if (data.type === 'RABBIT_HUD_STATE') {
@@ -57,6 +59,19 @@ $w.onReady(function () {
             }
         }
     });
+});
+
+// If a page contains a custom logout control, use Wix's member session API.
+// Missing IDs are ignored so native Wix member menus continue to work normally.
+$w.onReady(async function () {
+    for (const id of ['#logoutButton', '#logout', '#signOut']) {
+        try {
+            const control = $w(id);
+            if (control && typeof control.onClick === 'function') {
+                control.onClick(() => authentication.logout());
+            }
+        } catch (_) { /* this page has no custom logout control */ }
+    }
 });
 
 // Consistent native text styling without changing repeater content.

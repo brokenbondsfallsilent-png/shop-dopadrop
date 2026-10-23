@@ -124,6 +124,7 @@ $w.onReady(function () {
             }
         }
     });
+    if (!rabbitWidget || typeof rabbitWidget.onMessage !== 'function') return;
     rabbitWidget.onMessage(async event => {
         const data = event.data || {};
         if (data.type !== 'rabbit-hole-action') return;
