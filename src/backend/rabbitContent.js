@@ -1,5 +1,12 @@
 export const TOTAL_BUTTONS = 50;
 export const REWARD_POINTS = 500;
+export const LOOTGREM_CHECKOUT_CODE = 'LOOTGREM';
+export const HUNT_STAGES = [
+    { threshold: 20, label: 'FIRST FOREST ENCOUNTER', difficulty: 'NORMAL' },
+    { threshold: 30, label: 'SECOND FOREST ENCOUNTER', difficulty: 'HARDER' },
+    { threshold: 40, label: 'THIRD FOREST ENCOUNTER', difficulty: 'EXTREME' },
+    { threshold: 50, label: 'TANGLEBRIGHT', difficulty: 'IMPOSSIBLE' }
+];
 export const CAMPAIGN_START = '2026-10-30';
 
 // The hunt is a relay, not a single-page gallery. Each ordinal belongs to
@@ -26,14 +33,14 @@ export const HUNT_ROUTE = [
 
 export const LOOTGREM_DIALOGUE = {
     welcome: {
-        text: 'The fire crackles. A moss-covered creature watches you. “Fifty little secrets. And you found every one.”',
+        text: 'The fire crackles. Tanglebright, the final Loot Seeker, watches you. “Fifty little secrets. And you found every one.”',
         choices: [
             { id: 'who', text: 'Who are you?' },
             { id: 'reward', text: 'I came for the treasure.' }
         ]
     },
     who: {
-        text: '“LOOTGREM. Keeper of lost buttons and very excellent apples.”',
+        text: '“I am Tanglebright, the Loot Seeker. I keep the final choice: five hundred loyalty points, or the checkout code LOOTGREM.”',
         choices: [{ id: 'reward', text: 'And my treasure?' }]
     },
     reward: {
@@ -50,27 +57,32 @@ export const LOOTGREM_DIALOGUE = {
 };
 
 export const FOREST_ENCOUNTERS = {
-    lootgrem: {
-        name: 'LOOTGREM',
-        actions: {
-            listen: { line: 'You listen as LOOTGREM recounts the first ember.', affinity: 2, fragment: 'Ember Song' },
-            share: { line: 'You share a tale of the road.', affinity: 1, fragment: 'Roadsong' }
-        }
-    },
     mothkeeper: {
-        name: 'The Mothkeeper',
+        name: 'The first forest encounter',
         actions: {
-            wait: { line: 'You let the lantern settle before asking.', affinity: 2, fragment: 'Lantern Oath' },
+            wait: { line: 'You let the Mothkeeper\'s lantern settle before asking.', affinity: 2, fragment: 'Lantern Oath' },
             ask: { line: 'You ask who lit the lantern.', affinity: 1, fragment: 'First Flame' }
         }
     },
     rootwhisper: {
-        name: 'Rootwhisper',
+        name: 'The second forest encounter',
         actions: {
             protect: { line: 'You shield a tiny shoot from the cold.', affinity: 2, fragment: 'Seed Promise' },
             explore: { line: 'You follow a root toward the dark.', affinity: 1, fragment: 'Root Map' }
         }
+    },
+    tanglebright: {
+        name: 'The final forest encounter',
+        actions: {
+            approach: { line: 'Tanglebright steps from the thicket. The final path to the cave opens.', affinity: 2, fragment: 'Tanglebright Thread' }
+        }
     }
+};
+
+export const TANGLEBRIGHT_REWARD = {
+    name: 'Tanglebright, the Loot Seeker',
+    code: LOOTGREM_CHECKOUT_CODE,
+    points: REWARD_POINTS
 };
 
 const RAW_DAYS = [

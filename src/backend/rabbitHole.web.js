@@ -5,6 +5,7 @@ import { accounts } from 'wix-loyalty.v2';
 import { elevate } from 'wix-auth';
 import {
     CAMPAIGN_START, DAILY_CONTENT, FOREST_ENCOUNTERS, LOOTGREM_DIALOGUE,
+    HUNT_STAGES, TANGLEBRIGHT_REWARD,
     REWARD_POINTS, TOTAL_BUTTONS, campaignDay
 } from './rabbitContent';
 import { addFind, normaliseState, publicState } from './rabbitCore';
@@ -111,10 +112,13 @@ export const chooseLootgrem = webMethod(Permissions.SiteMember, async (node, opt
     if (node !== current) throw new Error('DIALOGUE_OUT_OF_SEQUENCE');
     const available = LOOTGREM_DIALOGUE[current]?.choices || [];
     if (!available.some(choice => choice.id === option)) throw new Error('INVALID_DIALOGUE_CHOICE');
-    if (option === 'claim') {
+    if (option === 'claim' || option === 'code') {
         state.lootgremState = { node: current, claimAuthorized: true };
+        state.rewardChoice = option === 'code' ? 'checkout_code' : 'loyalty_points';
         await save(state);
-        return { next: 'claim', requiresExplicitClaim: true, rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED };
+        return option === 'code'
+            ? { next: 'code', requiresExplicitClaim: true, checkoutCode: TANGLEBRIGHT_REWARD.code }
+            : { next: 'claim', requiresExplicitClaim: true, rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED };
     }
     state.lootgremState = { node: option, claimAuthorized: false };
     await save(state);
@@ -124,11 +128,16 @@ export const chooseLootgrem = webMethod(Permissions.SiteMember, async (node, opt
 export const forestEncounter = webMethod(Permissions.SiteMember, async (characterId, actionId) => {
     const id = await memberId();
     const state = await load(id);
-    if (state.foundCount < 1) throw new Error('FIRST_DISCOVERY_REQUIRED');
+    const encounterNumber = state.forestState?.encounters?.length || 0;
+    const requiredThreshold = HUNT_STAGES[encounterNumber]?.threshold;
+    if (!requiredThreshold || state.foundCount < requiredThreshold) throw new Error('FOREST_STAGE_LOCKED');
     const encounter = FOREST_ENCOUNTERS[characterId]?.actions?.[actionId];
     if (!encounter) throw new Error('UNKNOWN_FOREST_ENCOUNTER');
     const key = `${characterId}:${actionId}`;
     const forest = state.forestState;
+    const sequence = ['mothkeeper:wait', 'rootwhisper:protect', 'tanglebright:approach'];
+    const expected = sequence[forest.encounters.length];
+    if (key !== expected) throw new Error('FOREST_PREDECESSOR_REQUIRED');
     if (forest.encounters.includes(key)) throw new Error('ENCOUNTER_ALREADY_RECORDED');
     forest.encounters.push(key);
     forest.bonds[characterId] = Number(forest.bonds[characterId] || 0) + encounter.affinity;
@@ -136,7 +145,7 @@ export const forestEncounter = webMethod(Permissions.SiteMember, async (characte
     if (forest.bonds[characterId] >= 3 && !forest.fragments.includes(`${characterId}:trusted`)) forest.fragments.push(`${characterId}:trusted`);
     state.forestState = forest;
     await save(state);
-    return { dialogue: encounter.line, affinity: forest.bonds[characterId], fragment: encounter.fragment, trusted: forest.bonds[characterId] >= 3, pointsAwarded: 0 };
+    return { dialogue: encounter.line, affinity: forest.bonds[characterId], fragment: encounter.fragment, trusted: forest.bonds[characterId] >= 3, pointsAwarded: 0, stage: encounterNumber + 1 };
 });
 
 export const getDailyContent = webMethod(Permissions.SiteMember, async () => {
@@ -203,4 +212,15 @@ export const claimReward = webMethod(Permissions.SiteMember, async () => {
     global.updatedAt = new Date();
     await wixData.save(GLOBAL_COLLECTION, global, { suppressAuth: true });
     return { status: 'awarded', alreadyAwarded: false, points: REWARD_POINTS, transactionId: state.rewardTransactionId };
+});
+
+export const claimCheckoutCode = webMethod(Permissions.SiteMember, async () => {
+    const id = await memberId();
+    const state = await load(id);
+    if (!state.caveUnlocked || !state.lootgremState?.claimAuthorized || state.rewardChoice !== 'checkout_code') throw new Error('REWARD_GATE_INCOMPLETE');
+    if (state.rewardStatus === 'code_issued') return { status: 'code_issued', code: TANGLEBRIGHT_REWARD.code, alreadyIssued: true };
+    state.rewardStatus = 'code_issued';
+    state.rewardIssuedAt = new Date();
+    await save(state);
+    return { status: 'code_issued', code: TANGLEBRIGHT_REWARD.code, alreadyIssued: false };
 });
