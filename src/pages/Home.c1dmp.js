@@ -9,18 +9,6 @@ import {
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
     const view = $w('#html1');
-    // The standalone Rabbit Hole widget is the separate #html2 embed.
-    // Keep #html1 reserved for the homepage so the widget bridge never
-    // accidentally targets or duplicates the homepage embed.
-    const rabbitWidget = $w('#html2');
-    if (rabbitWidget) rabbitWidget.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/rabbit-widget.html?v=5528520';
-    // Keep the gemstone launcher visible in the editor and preview. Some Wix
-    // responsive breakpoints can leave an HTML component collapsed even though
-    // its iframe content is still present in the accessibility tree.
-    try {
-        if (rabbitWidget && typeof rabbitWidget.expand === 'function') rabbitWidget.expand();
-        if (rabbitWidget && typeof rabbitWidget.show === 'function') rabbitWidget.show();
-    } catch (_) { /* component visibility is controlled by the page layout */ }
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
     // Cache-bust the homepage asset so Wix does not reuse the pre-HUD-removal copy.
     // Force Wix's HTML component to load the current bridge-enabled build.
@@ -135,47 +123,6 @@ $w.onReady(function () {
             } catch (error) {
                 view.postMessage({ type: 'RABBIT_LOGIN_RESULT', ok: false, error: error?.message || 'LOGIN_CANCELLED' });
             }
-        }
-    });
-    if (!rabbitWidget || typeof rabbitWidget.onMessage !== 'function') return;
-    rabbitWidget.onMessage(async event => {
-        const data = event.data || {};
-        if (data.type !== 'rabbit-hole-action') return;
-        const requestId = `widget-${Date.now()}`;
-        if (data.action === 'sign-in') {
-            try {
-                await authentication.promptLogin();
-                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', action: data.action, ok: true });
-            } catch (error) {
-                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', action: data.action, ok: false, error: error?.message || 'LOGIN_CANCELLED' });
-            }
-            return;
-        }
-        const actions = {
-            'enter-cave': () => { wixLocationFrontend.to('/rabbit-hole-cave'); return Promise.resolve({ destination: '/rabbit-hole-cave' }); },
-            forest: () => { wixLocationFrontend.to('/rabbit-hole-forest'); return Promise.resolve({ destination: '/rabbit-hole-forest' }); },
-            'daily-clue': () => { wixLocationFrontend.to('/rabbit-hole-daily'); return Promise.resolve({ destination: '/rabbit-hole-daily' }); }
-        };
-        if (data.action === 'reset-test') {
-            try {
-                if (!(await authentication.loggedIn())) throw new Error('MEMBER_LOGIN_REQUIRED');
-                const payload = await resetHuntState();
-                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: true, payload });
-            } catch (error) {
-                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: String(error?.message || error) });
-            }
-            return;
-        }
-        if (!actions[data.action]) return;
-        try {
-            if (!(await authentication.loggedIn())) {
-                rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: 'MEMBER_LOGIN_REQUIRED' });
-                return;
-            }
-            const payload = await actions[data.action]();
-            rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: true, payload });
-        } catch (error) {
-            rabbitWidget.postMessage({ type: 'RABBIT_WIDGET_RESULT', requestId, action: data.action, ok: false, error: String(error?.message || error) });
         }
     });
 });
