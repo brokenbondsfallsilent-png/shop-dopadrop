@@ -40,7 +40,7 @@ $w.onReady(function () {
         '/category/focus-calm-tools', '/category/stim-toys-squishies',
         '/category/sensory-kits-bundles', '/category/movement-balance',
         '/category/all-products', '/category/best-sellers', '/gift-card',
-        '/about', '/contact', '/blog', '/cart-page', '/shipping-policy', '/refund-policy',
+        '/about', '/contact', '/blog', '/cart-page', '/profile/my/profile', '/shipping-policy', '/refund-policy',
         '/privacy-policy', '/terms-and-conditions', '/accessibility-statement'
     ]);
     function mediaUrl(value) {

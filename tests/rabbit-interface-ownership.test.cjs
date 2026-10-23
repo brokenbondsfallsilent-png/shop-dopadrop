@@ -24,13 +24,14 @@ test('the shared header owns the single gemstone launcher', () => {
     assert.doesNotMatch(source, /rabbitWidget\.collapse\(\)/);
 });
 
-test('the shared header hides only the duplicate announcement-strip account control', () => {
+test('the embedded Home header owns one account link and native member bars are removed', () => {
     const source = read('src/pages/masterPage.js');
+    const home = read('src/public/shop-dopadrop-home-current.html');
 
-    assert.match(source, /\$w\(['"]#comp-m00ruy093['"]\)/);
-    assert.match(source, /duplicateAccountControl\.delete\(\)/);
-    assert.match(source, /duplicateAccountControl\.collapse\(\)/);
-    assert.doesNotMatch(source, /\$w\(['"]#comp-mvl7duy5['"]\)/);
+    assert.match(source, /#comp-m00ruy093/);
+    assert.match(source, /#comp-mvl7duy5/);
+    assert.match(source, /accountControl\.delete\(\)/);
+    assert.equal((home.match(/aria-label="Account"/g) || []).length, 1);
 });
 
 test('the Home embed suppresses its internal HUD so only the header gem is visible', () => {

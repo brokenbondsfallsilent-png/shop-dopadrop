@@ -4,19 +4,16 @@ import { getHuntState, resetHuntState } from 'backend/rabbitHole.web';
 // Shared Shop-DopaDrop branding. Existing Wix store and member controls stay native.
 $w.onReady(function () {
     $w('#vectorImage2').src = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"14\" fill=\"#09090d\" stroke=\"#ff37bb\" stroke-width=\"2\"/><path d=\"M18 4 8 18h7l-1 10 10-15h-7z\" fill=\"#f5ff37\"/></svg>";
-    // This is the redundant login bar in the announcement strip. Keep the
-    // separate navigation-row member control intact.
-    try {
-        const duplicateAccountControl = $w('#comp-m00ruy093');
-        if (duplicateAccountControl && typeof duplicateAccountControl.delete === 'function') {
-            // Soft-delete this runtime duplicate so breakpoint-specific layout
-            // rules cannot make it visible again. The navigation-row account
-            // control is a different element and remains untouched.
-            duplicateAccountControl.delete();
-        } else if (duplicateAccountControl && typeof duplicateAccountControl.collapse === 'function') {
-            duplicateAccountControl.collapse();
-        }
-    } catch (_) { /* the duplicate is not present on this breakpoint */ }
+    // The full-page Home embed owns the visible header. Remove both native
+    // member bars at runtime so one cannot sit behind it on desktop while two
+    // overlap it on mobile. The Home header exposes the single Account link.
+    for (const accountId of ['#comp-m00ruy093', '#comp-mvl7duy5']) {
+        try {
+            const accountControl = $w(accountId);
+            if (accountControl && typeof accountControl.delete === 'function') accountControl.delete();
+            else if (accountControl && typeof accountControl.collapse === 'function') accountControl.collapse();
+        } catch (_) { /* the native member bar is not present on this breakpoint */ }
+    }
     $w('Text').forEach(element => {
         const text = (element.text || '').trim();
         if (text === 'About' || text === 'Contact') {
