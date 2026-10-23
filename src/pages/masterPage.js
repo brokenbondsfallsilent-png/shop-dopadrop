@@ -33,6 +33,15 @@ $w.onReady(function () {
 // Shared header hunt HUD. The header iframe is intentionally compact and
 // delegates the secured member-state lookup to this page-level bridge.
 $w.onReady(function () {
+    // Replace the legacy full-page embed consistently on every Wix route.
+    // The component is absent on a few native account/system pages, so this
+    // remains intentionally guarded and never blocks those pages.
+    try {
+        const huntView = $w('#html1');
+        if (huntView) huntView.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/';
+    } catch (error) {
+        console.info('Rabbit Hole embed not present on this page');
+    }
     const hud = $w('#html2');
     if (!hud) return;
     const currentHuntPage = () => {
