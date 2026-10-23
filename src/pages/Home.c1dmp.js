@@ -138,9 +138,9 @@ $w.onReady(function () {
             return;
         }
         const actions = {
-            'enter-cave': () => enterCave(),
-            forest: () => forestEncounter('forest', 'observe'),
-            'daily-clue': () => getDailyContent()
+            'enter-cave': () => { wixLocationFrontend.to('/rabbit-hole-cave'); return Promise.resolve({ destination: '/rabbit-hole-cave' }); },
+            forest: () => { wixLocationFrontend.to('/rabbit-hole-forest'); return Promise.resolve({ destination: '/rabbit-hole-forest' }); },
+            'daily-clue': () => { wixLocationFrontend.to('/rabbit-hole-daily'); return Promise.resolve({ destination: '/rabbit-hole-daily' }); }
         };
         if (!actions[data.action]) return;
         try {
