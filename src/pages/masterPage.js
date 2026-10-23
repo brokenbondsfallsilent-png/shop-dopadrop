@@ -8,7 +8,12 @@ $w.onReady(function () {
     // separate navigation-row member control intact.
     try {
         const duplicateAccountControl = $w('#comp-m00ruy093');
-        if (duplicateAccountControl && typeof duplicateAccountControl.collapse === 'function') {
+        if (duplicateAccountControl && typeof duplicateAccountControl.delete === 'function') {
+            // Soft-delete this runtime duplicate so breakpoint-specific layout
+            // rules cannot make it visible again. The navigation-row account
+            // control is a different element and remains untouched.
+            duplicateAccountControl.delete();
+        } else if (duplicateAccountControl && typeof duplicateAccountControl.collapse === 'function') {
             duplicateAccountControl.collapse();
         }
     } catch (_) { /* the duplicate is not present on this breakpoint */ }

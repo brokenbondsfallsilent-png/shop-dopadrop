@@ -28,6 +28,7 @@ test('the shared header hides only the duplicate announcement-strip account cont
     const source = read('src/pages/masterPage.js');
 
     assert.match(source, /\$w\(['"]#comp-m00ruy093['"]\)/);
+    assert.match(source, /duplicateAccountControl\.delete\(\)/);
     assert.match(source, /duplicateAccountControl\.collapse\(\)/);
     assert.doesNotMatch(source, /\$w\(['"]#comp-mvl7duy5['"]\)/);
 });
