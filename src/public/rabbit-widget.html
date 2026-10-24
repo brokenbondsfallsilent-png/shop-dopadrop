@@ -3,3 +3,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent
 </style></head><body><button class="gem" id="g" aria-label="Open Rabbit Hole"></button><section class="panel" id="p"><button class="close" id="x" aria-label="Close Rabbit Hole">×</button><strong>THE RABBIT HOLE</strong><p>Find the 50 restless forest buttons. Member progress is saved securely.</p><p>Already a member? <button class="signin" id="s">Sign In</button></p><div id="count" style="color:#fff200;font-weight:bold;margin:7px 0">0 / 50</div><div class="row"><button id="c">Enter cave</button><button id="f">Forest</button><button id="d">30-day clue</button><button class="reset" id="r">Reset test</button></div><p id="status" aria-live="polite"></p></section><script>
 const send=(action)=>parent.postMessage({type:'rabbit-hole-action',action},'*');g.onclick=()=>p.classList.add('open');x.onclick=()=>p.classList.remove('open');s.onclick=()=>send('sign-in');c.onclick=()=>send('enter-cave');f.onclick=()=>send('forest');d.onclick=()=>send('daily-clue');r.onclick=()=>send('reset-test');window.addEventListener('message',e=>{const d=e.data||{};if(d.type==='RABBIT_WIDGET_RESULT'){status.textContent=d.ok?(d.action==='reset-test'?'Test progress reset. Start at button 1.':'Action sent: '+d.action):(d.error||'Action failed');if(d.payload?.found!==undefined)count.textContent=d.payload.found+' / '+d.payload.required}});send('state');
 </script></body></html>
+</script>
+<script>
+  // Membership is enforced by the Wix page gate; do not show a second iframe sign-in control.
+  document.getElementById('s')?.closest('p')?.remove();
+</script>

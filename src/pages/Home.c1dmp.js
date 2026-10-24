@@ -16,7 +16,7 @@ $w.onReady(function () {
     // Force Wix's HTML component to load the current bridge-enabled build.
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
-    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=4f24fe0';
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=4f24fe1';
     // Test mode keeps the full 50-button sequence inside this Home embed.
     // Production routing can be restored once every destination page owns an embed.
     const currentHuntPage = () => '/';
