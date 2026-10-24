@@ -17,9 +17,14 @@ $w.onReady(function () {
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
     view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=4f24fe1';
-    // Test mode keeps the full 50-button sequence inside this Home embed.
-    // Production routing can be restored once every destination page owns an embed.
-    const currentHuntPage = () => '/';
+    // The hunt is page-aware: the server rejects a discovery unless the
+    // browser is on the assigned destination route.
+    const currentHuntPage = () => {
+        const path = Array.isArray(wixLocationFrontend.path)
+            ? wixLocationFrontend.path.filter(Boolean).join('/')
+            : '';
+        return path ? '/' + path : '/';
+    };
     ['#section3', '#section2'].forEach(id => $w(id).collapse());
     async function readAll(collection) {
         let page = await wixData.query(collection).limit(100).find();
@@ -106,8 +111,7 @@ $w.onReady(function () {
             const actions = {
                 state: () => getHuntState(),
                 reset: () => resetHuntState(),
-                // Test mode keeps the complete hunt on Home; omit the production route check.
-                find: () => findButton(data.buttonId, null),
+                find: () => findButton(data.buttonId, currentHuntPage()),
                 cave: () => enterCave(),
                 dialogue: () => chooseLootgrem(data.node, data.option),
                 encounter: () => forestEncounter(data.characterId, data.actionId),
