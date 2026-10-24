@@ -17,11 +17,9 @@ $w.onReady(function () {
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
     view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=4f24fe0';
-    const currentHuntPage = () => {
-        const path = Array.isArray(wixLocationFrontend.path) ? wixLocationFrontend.path : [];
-        return !path.length || (path.length === 1 && path[0].toLowerCase() === 'home')
-            ? '/' : '/' + path.join('/');
-    };
+    // Test mode keeps the full 50-button sequence inside this Home embed.
+    // Production routing can be restored once every destination page owns an embed.
+    const currentHuntPage = () => '/';
     ['#section3', '#section2'].forEach(id => $w(id).collapse());
     async function readAll(collection) {
         let page = await wixData.query(collection).limit(100).find();
