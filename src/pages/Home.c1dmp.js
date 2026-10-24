@@ -106,7 +106,8 @@ $w.onReady(function () {
             const actions = {
                 state: () => getHuntState(),
                 reset: () => resetHuntState(),
-                find: () => findButton(data.buttonId, currentHuntPage()),
+                // Test mode keeps the complete hunt on Home; omit the production route check.
+                find: () => findButton(data.buttonId, null),
                 cave: () => enterCave(),
                 dialogue: () => chooseLootgrem(data.node, data.option),
                 encounter: () => forestEncounter(data.characterId, data.actionId),
