@@ -88,12 +88,7 @@ export const findButton = webMethod(Permissions.SiteMember, async (buttonId, pag
             });
         } catch (error) {
             // A profile-sync issue must never invalidate an already-saved hunt find.
-            // The profile collection is optional during staged hunt testing. Do not
-            // surface Wix's raw missing-collection warning to the player.
-            const message = String(error?.message || error || '').toLowerCase();
-            if (!message.includes('wde0025') && !message.includes('dopamemberprofiles')) {
-                console.error('DopaVerse profile sync failed:', error);
-            }
+            console.error('DopaVerse profile sync failed:', error);
         }
     }
     return { newFind: isNew, ...publicState(state) };
