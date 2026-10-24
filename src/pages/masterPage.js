@@ -75,6 +75,18 @@ $w.onReady(function () {
             reply(false, undefined, String(error?.message || error));
         }
     });
+    // Relay discoveries from the Home hunt iframe to the single visible header HUD.
+    try {
+        const huntFrame = $w('#html3');
+        huntFrame.onMessage(event => {
+            const data = event.data || {};
+            if (data.type !== 'RABBIT_HOLE_RESULT') return;
+            rabbitWidget.postMessage({
+                type: 'RABBIT_WIDGET_RESULT', action: 'state', ok: data.ok,
+                payload: data.payload, error: data.error
+            });
+        });
+    } catch (_) { /* Home-only hunt frame is not present on other pages. */ }
 });
 
 // If a page contains a custom logout control, use Wix's member session API.
