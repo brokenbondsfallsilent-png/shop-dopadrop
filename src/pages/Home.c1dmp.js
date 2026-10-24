@@ -8,7 +8,9 @@ import {
 
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
 $w.onReady(function () {
-    const view = $w('#html1');
+    // Rabbit Hole is hosted by the current homepage embed.
+    // Keep the receiver bound to html3; html1 is the legacy homepage embed.
+    const view = $w('#html3');
     // Keep the hunt asset versioned and HTTPS-hosted. Draft-only until Wix is published.
     // Cache-bust the homepage asset so Wix does not reuse the pre-HUD-removal copy.
     // Force Wix's HTML component to load the current bridge-enabled build.
