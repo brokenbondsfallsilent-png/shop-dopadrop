@@ -52,7 +52,9 @@ export function verifyChallenge(challenge, attempt = {}) {
     if (attempt.memberId !== challenge.memberId) throw new Error('CHALLENGE_MEMBER_MISMATCH');
     if (attempt.buttonId !== challenge.buttonId) throw new Error('CHALLENGE_STEP_MISMATCH');
     if (attempt.pagePath !== challenge.pagePath) throw new Error('CHALLENGE_PAGE_MISMATCH');
-    if (attempt.stateVersion !== undefined && Number(attempt.stateVersion) !== Number(challenge.stateVersion)) {
+    if (!Number.isInteger(attempt.stateVersion)) throw new Error('CHALLENGE_STATE_REQUIRED');
+    if (!Number.isInteger(challenge.stateVersion)) throw new Error('CHALLENGE_STATE_INVALID');
+    if (attempt.stateVersion !== challenge.stateVersion) {
         throw new Error('CHALLENGE_STATE_CHANGED');
     }
     const suppliedDigest = Buffer.from(tokenDigest(attempt.token), 'hex');

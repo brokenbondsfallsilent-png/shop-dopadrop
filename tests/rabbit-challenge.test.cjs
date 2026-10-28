@@ -20,16 +20,16 @@ test('a challenge is bound to one member, next button, and owning page', () => {
     const acceptedAt = new Date(base.getTime() + CHALLENGE_MIN_AGE_MS);
 
     assert.equal(verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 7, pagePath: '/about', token: 'opaque-token', now: acceptedAt
+        memberId: 'member-a', buttonId: 7, pagePath: '/about', token: 'opaque-token', stateVersion: 1, now: acceptedAt
     }).ok, true);
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-b', buttonId: 7, pagePath: '/about', token: 'opaque-token', now: acceptedAt
+        memberId: 'member-b', buttonId: 7, pagePath: '/about', token: 'opaque-token', stateVersion: 1, now: acceptedAt
     }), /CHALLENGE_MEMBER_MISMATCH/);
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 8, pagePath: '/about', token: 'opaque-token', now: acceptedAt
+        memberId: 'member-a', buttonId: 8, pagePath: '/about', token: 'opaque-token', stateVersion: 1, now: acceptedAt
     }), /CHALLENGE_STEP_MISMATCH/);
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 7, pagePath: '/contact', token: 'opaque-token', now: acceptedAt
+        memberId: 'member-a', buttonId: 7, pagePath: '/contact', token: 'opaque-token', stateVersion: 1, now: acceptedAt
     }), /CHALLENGE_PAGE_MISMATCH/);
 });
 
@@ -40,17 +40,31 @@ test('instant, expired, replayed, and forged challenge completions are rejected'
     const challenge = issued.state.activeChallenge;
 
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', now: base
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', stateVersion: 1, now: base
     }), /CHALLENGE_TOO_FAST/);
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'fake-token', now: new Date(base.getTime() + CHALLENGE_MIN_AGE_MS)
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'fake-token', stateVersion: 1, now: new Date(base.getTime() + CHALLENGE_MIN_AGE_MS)
     }), /CHALLENGE_TOKEN_INVALID/);
     assert.throws(() => verifyChallenge({ ...challenge, usedAt: acceptedIso() }, {
-        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', now: new Date(base.getTime() + CHALLENGE_MIN_AGE_MS)
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', stateVersion: 1, now: new Date(base.getTime() + CHALLENGE_MIN_AGE_MS)
     }), /CHALLENGE_ALREADY_USED/);
     assert.throws(() => verifyChallenge(challenge, {
-        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', now: new Date(base.getTime() + CHALLENGE_TTL_MS + 1)
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', stateVersion: 1, now: new Date(base.getTime() + CHALLENGE_TTL_MS + 1)
     }), /CHALLENGE_EXPIRED/);
+});
+
+test('challenge verification requires the bound hunt-state revision', () => {
+    const challenge = issueChallenge({ version: 7 }, {
+        memberId: 'member-a', buttonId: 1, pagePath: '/', now: base, token: 'real-token'
+    }).state.activeChallenge;
+    const acceptedAt = new Date(base.getTime() + CHALLENGE_MIN_AGE_MS);
+
+    assert.throws(() => verifyChallenge(challenge, {
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', now: acceptedAt
+    }), /CHALLENGE_STATE_REQUIRED/);
+    assert.throws(() => verifyChallenge(challenge, {
+        memberId: 'member-a', buttonId: 1, pagePath: '/', token: 'real-token', stateVersion: 'seven', now: acceptedAt
+    }), /CHALLENGE_STATE_REQUIRED/);
 });
 
 test('the persisted challenge contains only a token digest', () => {
