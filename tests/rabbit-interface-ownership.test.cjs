@@ -72,8 +72,8 @@ test('the compact widget has one complete document and no duplicate sign-in cont
 
     assert.equal(servedSource, source);
     assert.equal((source.match(/<\/html>/gi) || []).length, 1);
-    assert.equal((source.match(/<script>/gi) || []).length, 1);
-    assert.equal((source.match(/<\/script>/gi) || []).length, 1);
+    assert.equal((source.match(/<script(?:\s|>)/gi) || []).length, 2);
+    assert.equal((source.match(/<\/script>/gi) || []).length, 2);
     assert.doesNotMatch(source, /id=["']s["']/);
     assert.doesNotMatch(source, /send\('sign-in'\)/);
 });
@@ -89,7 +89,8 @@ test('the compact widget cannot reset hunt progress and exposes dialog state', (
     assert.match(widget, /role="dialog"/);
     assert.match(widget, /e\.key==='Escape'/);
     assert.match(widget, /id="c" type="button" disabled/);
-    assert.match(widget, /c\.disabled=!d\.payload\.caveUnlocked/);
+    assert.match(widget, /c\.disabled=view\.percent<100/);
+    assert.match(widget, /c\.disabled=!message\.payload\.caveUnlocked/);
     assert.match(widget, /e\.source!==parent/);
     assert.match(widget, /e\.key==='Tab'/);
     assert.match(widget, /button:not\(:disabled\)/);
@@ -106,5 +107,24 @@ test('the compact widget cannot reset hunt progress and exposes dialog state', (
 
     const backend = read('src/backend/rabbitHole.web.js');
     assert.doesNotMatch(backend, /export const resetHuntState/);
+});
+
+test('the single gem requests and renders the allowlisted member dashboard', () => {
+    const widget = read('src/public/rabbit-widget.html');
+    const servedWidget = read('docs/rabbit-widget.html');
+    const view = read('src/public/rabbitDashboardView.js');
+    const servedView = read('docs/rabbitDashboardView.js');
+    const masterPage = read('src/pages/masterPage.js');
+
+    assert.equal(servedWidget, widget);
+    assert.equal(servedView, view);
+    assert.match(widget, /rabbitDashboardView\.js/);
+    assert.match(widget, /id="dashboard"/);
+    assert.match(widget, /send\('dashboard'\)/);
+    assert.match(widget, /send\('dashboard-next'\)/);
+    assert.match(masterPage, /getMyRabbitDashboard/);
+    assert.match(masterPage, /data\.action === 'dashboard'/);
+    assert.match(masterPage, /data\.action === 'dashboard-next'/);
+    assert.doesNotMatch(widget, /innerHTML\s*=/);
 });
 
