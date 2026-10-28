@@ -17,8 +17,10 @@ export function inspectDailyAttempts(state = {}, day, now = new Date()) {
     const key = dayKey(day);
     const nowMs = time(now);
     const windowStart = nowMs - DAILY_ATTEMPT_WINDOW_MS;
-    const recent = (state.dailyAttemptWindows?.[key] || [])
-        .map(time)
+    const stored = state.dailyAttemptWindows?.[key];
+    const recent = (Array.isArray(stored) ? stored : [])
+        .map(attempt => new Date(attempt).getTime())
+        .filter(Number.isFinite)
         .filter(attempt => attempt > windowStart && attempt <= nowMs)
         .sort((a, b) => a - b);
     const nextState = {

@@ -48,3 +48,24 @@ test('attempt records reject invalid day and time inputs', () => {
     assert.throws(() => inspectDailyAttempts({}, 31, base), /DAILY_DAY_INVALID/);
     assert.throws(() => inspectDailyAttempts({}, 1, 'not-a-date'), /DAILY_TIME_INVALID/);
 });
+
+test('malformed persisted attempts are discarded without erasing valid failures', () => {
+    const validFailures = Array.from(
+        { length: DAILY_ATTEMPT_LIMIT - 1 },
+        (_, index) => new Date(base.getTime() + index).toISOString()
+    );
+    const state = {
+        dailyAttemptWindows: {
+            1: ['not-a-date', ...validFailures, null, {}, Number.POSITIVE_INFINITY]
+        }
+    };
+
+    const inspected = inspectDailyAttempts(
+        state,
+        1,
+        new Date(base.getTime() + DAILY_ATTEMPT_LIMIT)
+    );
+
+    assert.equal(inspected.remaining, 1);
+    assert.deepEqual(inspected.state.dailyAttemptWindows['1'], validFailures.map(value => new Date(value).getTime()));
+});
