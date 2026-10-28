@@ -1,16 +1,16 @@
 import { HUNT_ROUTE, HUNT_STAGES, TOTAL_BUTTONS } from './rabbitContent';
+import { normaliseRabbitDetails } from './rabbitState';
 
 export function normaliseState(item = {}) {
     const foundIds = [...new Set((item.foundIds || []).map(Number).filter(id => Number.isInteger(id) && id >= 1 && id <= TOTAL_BUTTONS))].sort((a, b) => a - b);
+    const details = normaliseRabbitDetails(item);
     return {
         ...item,
         foundIds,
         foundCount: foundIds.length,
         caveUnlocked: foundIds.length === TOTAL_BUTTONS,
         caveEntered: Boolean(item.caveEntered),
-        lootgremState: item.lootgremState || { node: 'welcome', claimAuthorized: false },
-        forestState: item.forestState || { bonds: {}, fragments: [], encounters: [] },
-        rewardStatus: item.rewardStatus || 'not_eligible',
+        ...details,
         version: Number(item.version || 1)
     };
 }
@@ -37,6 +37,7 @@ export function addFind(item, buttonId, pagePath) {
 export function publicState(item) {
     const state = normaliseState(item);
     const nextId = state.foundCount + 1;
+    const rewardChoice = ['checkout_code', 'loyalty_points'].includes(state.rewardChoice) ? state.rewardChoice : null;
     return {
         foundIds: state.foundIds,
         found: state.foundCount,
@@ -44,6 +45,7 @@ export function publicState(item) {
         caveUnlocked: state.caveUnlocked,
         caveEntered: state.caveEntered,
         rewardStatus: state.rewardStatus,
+        rewardChoice,
         nextButtonId: nextId <= TOTAL_BUTTONS ? nextId : null,
         nextPage: nextId <= TOTAL_BUTTONS ? HUNT_ROUTE[nextId - 1] : null,
         stage: HUNT_STAGES.find(stage => nextId <= stage.threshold) || HUNT_STAGES.at(-1),

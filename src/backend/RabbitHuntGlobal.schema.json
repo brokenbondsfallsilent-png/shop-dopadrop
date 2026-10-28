@@ -1,0 +1,15 @@
+{
+  "collectionId": "RabbitHuntGlobal",
+  "displayName": "Rabbit Hunt Global",
+  "permissions": {
+    "read": "siteOwner",
+    "insert": "siteOwner",
+    "update": "siteOwner",
+    "remove": "siteOwner"
+  },
+  "fields": {
+    "claimantCount": "number",
+    "updatedAt": "datetime"
+  },
+  "indexes": []
+}

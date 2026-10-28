@@ -2,8 +2,8 @@ import wixData from 'wix-data';
 import wixLocationFrontend from 'wix-location-frontend';
 import { authentication } from 'wix-members-frontend';
 import {
-    claimReward, chooseLootgrem, enterCave, findButton, forestEncounter,
-    getDailyContent, getHuntState, resetHuntState, solveDailyContent
+    beginButtonChallenge, claimReward, chooseLootgrem, enterCave, findButton, forestEncounter,
+    getDailyContent, getHuntState, solveDailyContent
 } from 'backend/rabbitHole.web';
 
 // Shop-DopaDrop: existing homepage, existing catalogue, no database writes.
@@ -110,8 +110,8 @@ $w.onReady(function () {
         if (data?.type === 'RABBIT_HOLE_REQUEST' && typeof data.requestId === 'string') {
             const actions = {
                 state: () => getHuntState(),
-                reset: () => resetHuntState(),
-                find: () => findButton(data.buttonId, currentHuntPage()),
+                challenge: () => beginButtonChallenge(data.buttonId, currentHuntPage()),
+                find: () => findButton(data.buttonId, currentHuntPage(), data.challengeToken),
                 cave: () => enterCave(),
                 dialogue: () => chooseLootgrem(data.node, data.option),
                 encounter: () => forestEncounter(data.characterId, data.actionId),

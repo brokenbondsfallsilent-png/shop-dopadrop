@@ -132,3 +132,17 @@ test('the DopaHQ member API exposes preferences but no client activity or permis
     assert.doesNotMatch(source, /export const (recordActivity|assignStaffRole|setProgressionXp)/);
     assert.doesNotMatch(source, /Permissions\.Anyone/);
 });
+
+test('Dopa member profiles stay private and are written only through trusted backend code', () => {
+    const schema = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../src/backend/DopaMemberProfiles.schema.json'), 'utf8'));
+    assert.deepEqual(schema.permissions, {
+        read: 'siteOwner',
+        insert: 'siteOwner',
+        update: 'siteOwner',
+        remove: 'siteOwner'
+    });
+
+    const backend = fs.readFileSync(path.resolve(__dirname, '../src/backend/dopaProfiles.js'), 'utf8');
+    assert.match(backend, /wixData\.get\(COLLECTION, memberId, \{ suppressAuth: true \}\)/);
+    assert.match(backend, /wixData\.save\(COLLECTION, next, \{ suppressAuth: true \}\)/);
+});

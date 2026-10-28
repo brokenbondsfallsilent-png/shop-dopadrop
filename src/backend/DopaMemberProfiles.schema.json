@@ -1,0 +1,25 @@
+{
+  "collectionId": "DopaMemberProfiles",
+  "displayName": "Dopa Member Profiles",
+  "permissions": {
+    "read": "siteOwner",
+    "insert": "siteOwner",
+    "update": "siteOwner",
+    "remove": "siteOwner"
+  },
+  "fields": {
+    "memberId": "text",
+    "progressionXp": "number",
+    "profileComplete": "boolean",
+    "hasActivity": "boolean",
+    "sensoryIdentity": "object",
+    "selectedTitles": "array",
+    "visibility": "object",
+    "activity": "object",
+    "processedActivityEventIds": "array",
+    "createdAt": "datetime",
+    "updatedAt": "datetime",
+    "version": "number"
+  },
+  "indexes": ["memberId"]
+}

@@ -44,4 +44,8 @@ Recommended fields:
 
 The Great Dopamine Hunt records authenticated button progress into the shared profile system. Failure to sync a profile is logged and does not invalidate an already-saved hunt discovery.
 
+Trusted activity patches merge monotonically before profile persistence. Numeric progress keeps the highest recorded value, permanent Boolean facts cannot revert from true to false, and collected fact lists are unioned without duplicates. Undefined, null, negative-count and nested-object patch values are ignored. This protects against ordinary delayed or out-of-order event patches; exact simultaneous-write behaviour must still be validated against the real Wix collection runtime before launch.
+
+Positive progression XP additionally requires a trusted `eventId`. Processed IDs are stored privately with the profile, and a duplicate delivery can refresh monotonic activity facts but cannot credit XP twice. The inline ledger retains the latest 250 IDs to bound profile size. If integrations later require permanent or high-volume deduplication, move event receipts to an owner-only append-only collection rather than increasing the member profile indefinitely.
+
 Shopping, loyalty, learning, community and event integrations can feed trusted aggregate fields into `recordDopaActivity()` as their Wix event handlers are enabled. Do not expose that function through a member-callable web method.

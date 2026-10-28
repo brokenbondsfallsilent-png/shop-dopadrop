@@ -47,6 +47,7 @@ export const LOOTGREM_DIALOGUE = {
         text: '“Five hundred points, once per traveller. Shall I place them in your pouch?”',
         choices: [
             { id: 'claim', text: 'Yes. Claim my 500 points.' },
+            { id: 'code', text: 'Give me the checkout code instead.' },
             { id: 'later', text: 'Not yet.' }
         ]
     },
@@ -55,6 +56,28 @@ export const LOOTGREM_DIALOGUE = {
         choices: [{ id: 'reward', text: 'I am ready now.' }]
     }
 };
+
+export function transitionLootgrem(currentState = {}, node, option, reward = {}) {
+    const current = currentState.node || 'welcome';
+    if (node !== current) throw new Error('DIALOGUE_OUT_OF_SEQUENCE');
+    const available = LOOTGREM_DIALOGUE[current]?.choices || [];
+    if (!available.some(choice => choice.id === option)) throw new Error('INVALID_DIALOGUE_CHOICE');
+    if (['pending', 'reconciliation_required', 'awarded', 'code_issued'].includes(reward.rewardStatus)) {
+        throw new Error('REWARD_CHOICE_LOCKED');
+    }
+    if (option === 'claim' || option === 'code') {
+        return {
+            state: { node: current, claimAuthorized: true },
+            rewardChoice: option === 'code' ? 'checkout_code' : 'loyalty_points',
+            response: { next: option, requiresExplicitClaim: true }
+        };
+    }
+    return {
+        state: { node: option, claimAuthorized: false },
+        rewardChoice: null,
+        response: { next: option, dialogue: LOOTGREM_DIALOGUE[option] }
+    };
+}
 
 export const FOREST_ENCOUNTERS = {
     mothkeeper: {
@@ -118,15 +141,39 @@ const RAW_DAYS = [
     ['The Thirty-First Shadow', 'The final shadow points back to the cave, where the journey began to change.', 'What survives after the last clue?', ['memory', 'a timer', 'a coupon'], 'memory']
 ];
 
-export const DAILY_CONTENT = RAW_DAYS.map((entry, index) => ({
-    day: index + 1,
-    title: entry[0],
-    teaser: entry[1],
-    prompt: entry[2],
-    choices: entry[3],
-    answer: entry[4],
-    collectible: `Forest Chronicle: ${entry[0]}`
-}));
+export function buildDailyContent(rawDays, expectedCount = 30) {
+    if (!Array.isArray(rawDays) || rawDays.length !== expectedCount) {
+        throw new Error('DAILY_CONTENT_COUNT_INVALID');
+    }
+    const titles = new Set();
+    return rawDays.map((entry, index) => {
+        if (!Array.isArray(entry) || entry.length !== 5) throw new Error('DAILY_CONTENT_FIELD_INVALID');
+        const [title, teaser, prompt, choices, answer] = entry;
+        if (![title, teaser, prompt, answer].every(value => typeof value === 'string' && value.trim())) {
+            throw new Error('DAILY_CONTENT_FIELD_INVALID');
+        }
+        const titleKey = title.trim().toLowerCase();
+        if (titles.has(titleKey)) throw new Error('DAILY_CONTENT_TITLE_DUPLICATE');
+        titles.add(titleKey);
+        if (!Array.isArray(choices) || choices.length !== 3 || !choices.every(choice => typeof choice === 'string' && choice.trim())) {
+            throw new Error('DAILY_CONTENT_CHOICES_INVALID');
+        }
+        const choiceKeys = choices.map(choice => choice.trim().toLowerCase());
+        if (new Set(choiceKeys).size !== choices.length) throw new Error('DAILY_CONTENT_CHOICES_INVALID');
+        if (!choiceKeys.includes(answer.trim().toLowerCase())) throw new Error('DAILY_CONTENT_ANSWER_INVALID');
+        return {
+            day: index + 1,
+            title,
+            teaser,
+            prompt,
+            choices: [...choices],
+            answer,
+            collectible: `Forest Chronicle: ${title}`
+        };
+    });
+}
+
+export const DAILY_CONTENT = buildDailyContent(RAW_DAYS);
 
 export function campaignDay(now = new Date(), start = CAMPAIGN_START) {
     const sydneyParts = new Intl.DateTimeFormat('en-AU', {

@@ -1,0 +1,33 @@
+{
+  "collectionId": "RabbitHuntMembers",
+  "displayName": "Rabbit Hunt Members",
+  "permissions": {
+    "read": "siteOwner",
+    "insert": "siteOwner",
+    "update": "siteOwner",
+    "remove": "siteOwner"
+  },
+  "fields": {
+    "memberId": "text",
+    "foundIds": "array",
+    "foundCount": "number",
+    "caveUnlocked": "boolean",
+    "caveEntered": "boolean",
+    "lootgremState": "object",
+    "forestState": "object",
+    "contentDay": "number",
+    "dailyAttemptWindows": "object",
+    "activeChallenge": "object",
+    "challengeIssueTimes": "array",
+    "rewardStatus": "text",
+    "rewardChoice": "text",
+    "rewardIdempotencyKey": "text",
+    "rewardPendingAt": "datetime",
+    "rewardTransactionId": "text",
+    "rewardIssuedAt": "datetime",
+    "rewardUncertainAt": "datetime",
+    "lastSeenAt": "datetime",
+    "version": "number"
+  },
+  "indexes": ["memberId"]
+}

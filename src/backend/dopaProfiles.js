@@ -1,5 +1,6 @@
 import wixData from 'wix-data';
 import { applyMemberPreferences, deriveAchievementTitles, normaliseIdentity, publicIdentity, questIdentity, rankForXp } from './dopaRoles';
+import { applyTrustedActivityEvent } from './dopaActivity';
 
 const COLLECTION = 'DopaMemberProfiles';
 
@@ -14,6 +15,7 @@ function fresh(memberId) {
         selectedTitles: [],
         visibility: {},
         activity: {},
+        processedActivityEventIds: [],
         createdAt: new Date(),
         updatedAt: new Date(),
         version: 1
@@ -37,10 +39,8 @@ export async function saveDopaProfile(profile) {
 
 export async function recordDopaActivity(memberId, activityPatch = {}, options = {}) {
     const profile = await loadDopaProfile(memberId);
-    profile.activity = { ...(profile.activity || {}), ...activityPatch };
-    profile.hasActivity = profile.hasActivity || Object.keys(activityPatch).length > 0;
-    profile.progressionXp = Math.max(0, Number(profile.progressionXp || 0) + Math.max(0, Number(options.xpDelta || 0)));
-    return saveDopaProfile(profile);
+    const applied = applyTrustedActivityEvent(profile, activityPatch, options);
+    return saveDopaProfile(applied.profile);
 }
 
 export async function updateDopaPreferences(memberId, requested = {}) {
