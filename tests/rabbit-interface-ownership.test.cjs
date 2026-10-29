@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), 'utf8');
@@ -141,5 +142,81 @@ test('the gem clears prior member data when the dashboard becomes signed out', (
     assert.match(widget, /text\(daily,'0 \/ 0'\)/);
     assert.match(widget, /text\(reward,'Treasure locked'\)/);
     assert.match(widget, /bar\.style\.width='0%'/);
+});
+
+test('the member dashboard renders when window.status is the browser status string', () => {
+    const widget = read('src/public/rabbit-widget.html');
+    const inlineScripts = [...widget.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
+    const script = inlineScripts.at(-1)[1];
+    const listeners = {};
+    const makeClassList = initial => {
+        const values = new Set(initial);
+        return {
+            add: value => values.add(value),
+            remove: value => values.delete(value),
+            contains: value => values.has(value)
+        };
+    };
+    const makeElement = (...classes) => ({
+        classList: makeClassList(classes),
+        setAttribute() {},
+        focus() {},
+        querySelectorAll() { return []; },
+        parentElement: { setAttribute() {} },
+        style: {},
+        textContent: '',
+        disabled: false,
+        title: ''
+    });
+    const elements = Object.fromEntries(
+        ['g', 'p', 'x', 'xp', 'count', 'forest', 'daily', 'reward', 'n', 'bar', 'c', 'f', 'd', 'dashboard', 'rank', 'identity', 'status']
+            .map(id => [id, makeElement(...(id === 'dashboard' ? ['dashboard', 'loading'] : []))])
+    );
+    const parent = { postMessage() {} };
+    const context = {
+        ...elements,
+        status: '',
+        parent,
+        document: {
+            activeElement: null,
+            addEventListener() {},
+            getElementById: id => elements[id]
+        },
+        window: {
+            addEventListener: (type, listener) => { listeners[type] = listener; }
+        },
+        RabbitDashboardView: {
+            buildDashboardView: () => ({
+                signedIn: true,
+                rank: 'Trail Starter',
+                identity: 'Dylan',
+                xp: '10 XP',
+                progress: '2 / 50',
+                forest: '1 encounter',
+                daily: '1 / 30',
+                reward: 'Treasure locked',
+                primary: { label: 'Continue the hunt' },
+                percent: 4
+            })
+        }
+    };
+
+    vm.runInNewContext(script, context);
+    listeners.message({
+        source: parent,
+        data: { type: 'RABBIT_WIDGET_RESULT', action: 'dashboard', ok: true, payload: {} }
+    });
+
+    assert.equal(elements.dashboard.classList.contains('loading'), false);
+    assert.equal(elements.status.textContent, 'DopaHQ ready.');
+    assert.equal(elements.rank.textContent, 'Trail Starter');
+});
+
+test('source and served mobile decoration bands clip transformed artwork', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    assert.match(source, /\.art-sprinkles\{[^}]*overflow:hidden/);
+    assert.match(servedSource, /\.art-sprinkles\{[^}]*overflow:hidden/);
 });
 
