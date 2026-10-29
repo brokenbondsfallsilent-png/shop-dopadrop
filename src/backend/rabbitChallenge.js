@@ -18,8 +18,10 @@ function tokenDigest(token) {
 export function issueChallenge(previous = {}, request = {}) {
     const nowMs = timestamp(request.now || new Date());
     const windowStart = nowMs - CHALLENGE_WINDOW_MS;
-    const recent = (previous.challengeIssueTimes || [])
-        .map(timestamp)
+    const storedIssueTimes = previous.challengeIssueTimes;
+    const recent = (Array.isArray(storedIssueTimes) ? storedIssueTimes : [])
+        .map(value => new Date(value).getTime())
+        .filter(Number.isFinite)
         .filter(time => time > windowStart && time <= nowMs);
     if (recent.length >= CHALLENGE_LIMIT) throw new Error('CHALLENGE_RATE_LIMITED');
     if (!request.memberId || !request.token) throw new Error('CHALLENGE_INPUT_INVALID');

@@ -111,6 +111,32 @@ test('challenge issuance is capped per rolling member window', () => {
     assert.equal(afterWindow.state.challengeIssueTimes.length, 1);
 });
 
+test('malformed persisted issue times are discarded without bypassing valid rate limits', () => {
+    const validTimes = Array.from(
+        { length: CHALLENGE_LIMIT - 1 },
+        (_, index) => new Date(base.getTime() + index).toISOString()
+    );
+    const issued = issueChallenge({
+        version: 3,
+        challengeIssueTimes: ['not-a-date', ...validTimes, null, {}, Number.POSITIVE_INFINITY]
+    }, {
+        memberId: 'member-a',
+        buttonId: 1,
+        pagePath: '/',
+        now: new Date(base.getTime() + CHALLENGE_LIMIT),
+        token: 'last-allowed-token'
+    });
+
+    assert.equal(issued.state.challengeIssueTimes.length, CHALLENGE_LIMIT);
+    assert.throws(() => issueChallenge(issued.state, {
+        memberId: 'member-a',
+        buttonId: 1,
+        pagePath: '/',
+        now: new Date(base.getTime() + CHALLENGE_LIMIT + 1),
+        token: 'one-too-many'
+    }), /CHALLENGE_RATE_LIMITED/);
+});
+
 function acceptedIso() {
     return new Date(base.getTime() + CHALLENGE_MIN_AGE_MS).toISOString();
 }
