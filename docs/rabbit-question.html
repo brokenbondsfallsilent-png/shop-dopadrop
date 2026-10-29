@@ -11,7 +11,8 @@ html,body{margin:0;min-height:100%;background:var(--black);font-family:Arial,san
 body{min-height:100vh;padding:clamp(18px,4vw,52px);display:grid;place-items:center;overflow-x:hidden}
 .environment{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:saturate(1.08) brightness(.72);transition:opacity .35s ease}
 .veil{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at 50% 44%,rgba(9,9,13,.18),rgba(9,9,13,.68) 70%,rgba(9,9,13,.92));pointer-events:none}
-.scene{position:relative;z-index:2;width:min(100%,1120px);display:grid;grid-template-columns:minmax(220px,380px) minmax(0,760px);align-items:end;justify-content:center;gap:clamp(10px,3vw,36px)}
+.scene{position:relative;z-index:2;width:min(100%,760px);display:grid;grid-template-columns:minmax(0,760px);align-items:end;justify-content:center;gap:clamp(10px,3vw,36px)}
+.scene.has-guardian{width:min(100%,1120px);grid-template-columns:minmax(220px,380px) minmax(0,760px)}
 .guardian{display:none;width:100%;max-height:78vh;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 22px 28px rgba(0,0,0,.55));transform-origin:center bottom;animation:guardian-breathe 5s ease-in-out infinite}
 .guardian.visible{display:block}
 .card{position:relative;overflow:hidden;width:100%;padding:32px;background:linear-gradient(160deg,rgba(18,18,27,.94),rgba(9,9,13,.96));backdrop-filter:blur(12px);border:1px solid rgba(125,232,255,.38);border-radius:24px;box-shadow:0 18px 54px rgba(0,0,0,.52)}
@@ -38,7 +39,7 @@ h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-heig
 .state-locked .status,.state-limited .status{color:var(--yellow)}
 @media (max-width:600px){
   body{padding:10px}
-  .scene{grid-template-columns:1fr;align-items:center}
+  .scene,.scene.has-guardian{width:100%;grid-template-columns:1fr;align-items:center}
   .guardian.visible{display:block;position:absolute;right:-28px;top:-92px;width:150px;height:180px;opacity:.42;z-index:0}
   .card{padding:20px 18px;border-radius:20px}
   .choices{grid-template-columns:1fr;gap:10px}
@@ -69,6 +70,7 @@ h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-heig
 <script src="rabbitQuestionView.js"></script>
 <script>
 const card=document.getElementById('card');
+const scene=card.parentElement;
 const environment=document.getElementById('environment');
 const guardian=document.getElementById('guardian');
 const eyebrow=document.getElementById('eyebrow');
@@ -97,8 +99,8 @@ const render=view=>{
   bar.style.width=view.progress.percent+'%';
   progress.setAttribute('aria-valuenow',String(view.progress.percent));
   environment.src=view.artwork.environment;
-  if(view.artwork.guardian){guardian.src=view.artwork.guardian;guardian.alt=view.artwork.guardianAlt;guardian.classList.add('visible')}
-  else{guardian.removeAttribute('src');guardian.alt='';guardian.classList.remove('visible')}
+  if(view.artwork.guardian){guardian.src=view.artwork.guardian;guardian.alt=view.artwork.guardianAlt;guardian.classList.add('visible');scene.classList.add('has-guardian')}
+  else{guardian.removeAttribute('src');guardian.alt='';guardian.classList.remove('visible');scene.classList.remove('has-guardian')}
   choices.replaceChildren();
   view.choices.forEach(item=>{
     const button=document.createElement('button');

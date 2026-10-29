@@ -287,6 +287,8 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
     assert.match(source, /id="guardian"/);
     assert.match(source, /view\.artwork\.environment/);
     assert.match(source, /view\.artwork\.guardian/);
+    assert.match(source, /scene\.classList\.add\('has-guardian'\)/);
+    assert.match(source, /scene\.classList\.remove\('has-guardian'\)/);
     assert.match(source, /prefers-reduced-motion/);
 
     for (const state of ['ready', 'pending', 'correct', 'incorrect', 'locked', 'completed', 'error', 'limited']) {

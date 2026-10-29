@@ -43,7 +43,7 @@ test('Forest exposes one authenticated safe stage and no generated button IDs', 
     assert.doesNotMatch(source, /comp-mvl0wln1|comp-mvl101pj|comp-mvl11a5p/);
     assert.match(source, /choiceMap\.get\(action\.choiceId\)/);
     assert.match(source, /forestEncounter\(choice\.characterId,\s*choice\.actionId\)/);
-    assert.match(source, /guardianKey:\s*view\.guardian\?\.characterId/);
+    assert.match(source, /guardianKey:\s*view\.guardian\?\.id/);
 });
 
 test('Forest refreshes the authoritative stage after success or stale action', () => {
