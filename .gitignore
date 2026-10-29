@@ -3,4 +3,5 @@ node_modules/
 .vscode/
 .idea/
 .wix/
+.superpowers/
 jsconfig.json
