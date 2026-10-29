@@ -15,7 +15,7 @@
         cave: 'assets/rabbit-hole/cave-environment-v2.png'
     });
     const GUARDIANS = Object.freeze({
-        mothkeeper: ['assets/rabbit-hole/mothkeeper-v2.png', 'Mothkeeper, guardian of the Rabbit Hole'],
+        mothkeeper: ['assets/rabbit-hole/mothkeeper-v4.png', 'Mothkeeper, guardian of the Rabbit Hole'],
         rootwhisper: ['assets/rabbit-hole/rootwhisper-v2.png', 'Rootwhisper, guardian of the Rabbit Hole'],
         grumblebark: ['assets/rabbit-hole/grumblebark-v2.png', 'Grumblebark, guardian of the Rabbit Hole'],
         tanglebright: ['assets/rabbit-hole/tanglebright-v2.png', 'Tanglebright, guardian of the Rabbit Hole']
