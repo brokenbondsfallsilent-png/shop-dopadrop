@@ -70,6 +70,7 @@ export function verifyChallenge(challenge, attempt = {}) {
     const nowMs = timestamp(attempt.now || new Date());
     const issuedAt = timestamp(challenge.issuedAt);
     const expiresAt = timestamp(challenge.expiresAt);
+    if (expiresAt - issuedAt !== CHALLENGE_TTL_MS) throw new Error('CHALLENGE_WINDOW_INVALID');
     if (nowMs < issuedAt + CHALLENGE_MIN_AGE_MS) throw new Error('CHALLENGE_TOO_FAST');
     if (nowMs > expiresAt) throw new Error('CHALLENGE_EXPIRED');
     return { ok: true, challenge: { ...challenge, usedAt: new Date(nowMs).toISOString() } };

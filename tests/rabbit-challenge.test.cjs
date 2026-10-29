@@ -137,6 +137,25 @@ test('malformed persisted issue times are discarded without bypassing valid rate
     }), /CHALLENGE_RATE_LIMITED/);
 });
 
+test('challenge verification rejects a persisted expiry window that exceeds the fixed TTL', () => {
+    const challenge = issueChallenge({ version: 4 }, {
+        memberId: 'member-a', buttonId: 1, pagePath: '/', now: base, token: 'real-token'
+    }).state.activeChallenge;
+    const extended = {
+        ...challenge,
+        expiresAt: new Date(base.getTime() + CHALLENGE_TTL_MS + 60_000).toISOString()
+    };
+
+    assert.throws(() => verifyChallenge(extended, {
+        memberId: 'member-a',
+        buttonId: 1,
+        pagePath: '/',
+        token: 'real-token',
+        stateVersion: 4,
+        now: new Date(base.getTime() + CHALLENGE_MIN_AGE_MS)
+    }), /CHALLENGE_WINDOW_INVALID/);
+});
+
 function acceptedIso() {
     return new Date(base.getTime() + CHALLENGE_MIN_AGE_MS).toISOString();
 }
