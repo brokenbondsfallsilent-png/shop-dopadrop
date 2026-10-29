@@ -29,6 +29,7 @@ export function bindRabbitQuestionView($w, options = {}) {
     const seenRequests = new Set();
     let ready = false;
     let inFlight = false;
+    let reloadRequested = false;
     view.src = QUESTION_VIEW_URL;
 
     const post = (type, requestId, payload) => view.postMessage({ type, requestId, payload });
@@ -39,13 +40,20 @@ export function bindRabbitQuestionView($w, options = {}) {
             post('RABBIT_QUESTION_RENDER', 'load-1', options.mapError(error, null));
         }
     };
+    const reload = async () => {
+        if (inFlight) {
+            reloadRequested = true;
+            return;
+        }
+        await load();
+    };
 
     view.onMessage(async event => {
         const data = event?.data;
         if (data?.type === 'RABBIT_QUESTION_READY') {
             if (ready) return;
             ready = true;
-            await load();
+            await reload();
             return;
         }
 
@@ -60,8 +68,12 @@ export function bindRabbitQuestionView($w, options = {}) {
             post('RABBIT_QUESTION_RESULT', action.requestId, options.mapError(error, action));
         } finally {
             inFlight = false;
+            if (reloadRequested) {
+                reloadRequested = false;
+                await load();
+            }
         }
     });
 
-    return { reload: load };
+    return { reload };
 }

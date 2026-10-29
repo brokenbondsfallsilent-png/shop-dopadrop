@@ -35,8 +35,8 @@ function harness(overrides = {}) {
         assert.equal(id, '#rabbitQuestionView');
         return view;
     };
-    bindRabbitQuestionView($w, options);
-    return { view, posted, calls, emit: data => listener({ data }) };
+    const bridge = bindRabbitQuestionView($w, options);
+    return { view, posted, calls, bridge, emit: data => listener({ data }) };
 }
 
 test('READY loads once and renders through the named HTML component', async () => {
@@ -112,6 +112,35 @@ test('a second distinct request cannot submit while the first is unresolved', as
     app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-3', action: 'answer', choiceId: 'yes' });
     await tick();
     assert.equal(app.calls.submit.length, 2);
+});
+
+test('reload waits for an in-flight action and then renders the fresh snapshot', async () => {
+    let release;
+    const app = harness({
+        submit: action => {
+            app.calls.submit.push(action);
+            return new Promise(resolve => { release = resolve; });
+        }
+    });
+    app.emit({ type: 'RABBIT_QUESTION_READY' });
+    await tick();
+    app.posted.length = 0;
+
+    app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-1', action: 'answer', choiceId: 'yes' });
+    await tick();
+    await app.bridge.reload();
+    assert.equal(app.calls.load, 1);
+    assert.equal(app.posted.length, 0);
+
+    release({ ok: true });
+    await tick();
+    await tick();
+    assert.equal(app.calls.submit.length, 1);
+    assert.equal(app.calls.load, 2);
+    assert.deepEqual(app.posted.map(message => message.type), [
+        'RABBIT_QUESTION_RESULT',
+        'RABBIT_QUESTION_RENDER'
+    ]);
 });
 
 test('backend errors render only the safe mapped snapshot', async () => {
