@@ -10,7 +10,7 @@
     ]);
     const IDENTIFIER = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
     const ENVIRONMENTS = Object.freeze({
-        daily: 'assets/rabbit-hole/daily-environment-v2.png',
+        daily: 'assets/rabbit-hole/daily-tavern-v4.png',
         forest: 'assets/rabbit-hole/forest-night-v3.png',
         cave: 'assets/rabbit-hole/cave-environment-v4.png'
     });

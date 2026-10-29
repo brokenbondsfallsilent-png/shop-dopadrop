@@ -40,9 +40,9 @@ test('daily choices remain ordered while private fields are discarded', () => {
     assert.equal(view.rewardChoice, undefined);
     assert.equal(view.answer, undefined);
     assert.deepEqual(view.artwork, {
-        environment: 'assets/rabbit-hole/daily-environment-v2.png',
-        environmentDay: 'assets/rabbit-hole/daily-environment-v2.png',
-        environmentNight: 'assets/rabbit-hole/daily-environment-v2.png',
+        environment: 'assets/rabbit-hole/daily-tavern-v4.png',
+        environmentDay: 'assets/rabbit-hole/daily-tavern-v4.png',
+        environmentNight: 'assets/rabbit-hole/daily-tavern-v4.png',
         guardian: null,
         guardianAlt: ''
     });
