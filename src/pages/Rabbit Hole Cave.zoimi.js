@@ -13,6 +13,7 @@ $w.onReady(async () => {
 
     const lockedSnapshot = (message = 'Find all 50 hidden discoveries before entering the cave.') => ({
         mode: 'cave',
+        guardianKey: 'tanglebright',
         eyebrow: 'Rabbit Hole Cave',
         progress: { current: 0, total: 1 },
         question: 'The cave remains sealed.',
@@ -24,6 +25,7 @@ $w.onReady(async () => {
 
     const dialogueSnapshot = (status) => ({
         mode: 'cave',
+        guardianKey: 'tanglebright',
         eyebrow: 'Cave dialogue · Tanglebright',
         progress: { current: currentNode === 'welcome' ? 0 : 1, total: 3 },
         question: dialogue?.text || 'The campfire waits.',
@@ -43,6 +45,7 @@ $w.onReady(async () => {
         const rewardDisabled = chosePoints && result.rewardIssuanceEnabled === false;
         return {
             mode: 'cave',
+            guardianKey: 'tanglebright',
             eyebrow: 'Cave dialogue · Choice recorded',
             progress: { current: 3, total: 3 },
             question: choseCode

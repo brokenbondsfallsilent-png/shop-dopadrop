@@ -7,9 +7,15 @@
 <style>
 :root{color-scheme:dark;--black:#09090d;--panel:#12121b;--white:#f4f4ef;--muted:#aaaab6;--cyan:#37e8ff;--pink:#ff37bb;--yellow:#f5ff37;--green:#a7ff42}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:transparent;font-family:Arial,sans-serif;color:var(--white)}
-body{padding:8px}
-.card{position:relative;overflow:hidden;width:min(100%,760px);margin:0 auto;padding:32px;background:linear-gradient(160deg,var(--panel),var(--black));border:1px solid #454552;border-radius:24px;box-shadow:0 18px 54px rgba(0,0,0,.34)}
+html,body{margin:0;min-height:100%;background:var(--black);font-family:Arial,sans-serif;color:var(--white)}
+body{min-height:100vh;padding:clamp(18px,4vw,52px);display:grid;place-items:center;overflow-x:hidden}
+.environment{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;filter:saturate(1.08) brightness(.72);transition:opacity .35s ease}
+.veil{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at 50% 44%,rgba(9,9,13,.18),rgba(9,9,13,.68) 70%,rgba(9,9,13,.92));pointer-events:none}
+.scene{position:relative;z-index:2;width:min(100%,760px);display:grid;grid-template-columns:minmax(0,760px);align-items:end;justify-content:center;gap:clamp(10px,3vw,36px)}
+.scene.has-guardian{width:min(100%,1120px);grid-template-columns:minmax(220px,380px) minmax(0,760px)}
+.guardian{display:none;width:100%;max-height:78vh;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 22px 28px rgba(0,0,0,.55));transform-origin:center bottom;animation:guardian-breathe 5s ease-in-out infinite}
+.guardian.visible{display:block}
+.card{position:relative;overflow:hidden;width:100%;padding:32px;background:linear-gradient(160deg,rgba(18,18,27,.94),rgba(9,9,13,.96));backdrop-filter:blur(12px);border:1px solid rgba(125,232,255,.38);border-radius:24px;box-shadow:0 18px 54px rgba(0,0,0,.52)}
 .card:before{content:"";position:absolute;z-index:0;width:220px;height:220px;right:-100px;top:-70px;border-radius:50%;background:var(--pink);filter:blur(110px);opacity:.14;pointer-events:none}
 .card>*{position:relative;z-index:1}
 .eyebrow{color:var(--cyan);font-size:12px;font-weight:900;line-height:1.3;letter-spacing:.15em;text-transform:uppercase}
@@ -32,7 +38,9 @@ h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-heig
 .state-incorrect .status,.state-error .status{color:var(--pink)}
 .state-locked .status,.state-limited .status{color:var(--yellow)}
 @media (max-width:600px){
-  body{padding:0}
+  body{padding:10px}
+  .scene,.scene.has-guardian{width:100%;grid-template-columns:1fr;align-items:center}
+  .guardian.visible{display:block;position:absolute;right:-28px;top:-92px;width:150px;height:180px;opacity:.42;z-index:0}
   .card{padding:20px 18px;border-radius:20px}
   .choices{grid-template-columns:1fr;gap:10px}
   .choice{justify-content:flex-start;min-height:48px;text-align:left;border-left:4px solid var(--cyan)}
@@ -40,11 +48,16 @@ h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-heig
   .choice:nth-child(3n){border-left-color:var(--yellow)}
   .choice:last-child:nth-child(odd){grid-column:auto}
 }
-@media (prefers-reduced-motion:reduce){.choice,.progress span{transition:none}}
+@keyframes guardian-breathe{50%{transform:translateY(-5px) rotate(.4deg)}}
+@media (prefers-reduced-motion:reduce){.choice,.progress span,.environment{transition:none}.guardian{animation:none}}
 </style>
 </head>
 <body>
-<main class="card state-ready" id="card" data-state="ready">
+<img class="environment" id="environment" alt="" aria-hidden="true">
+<div class="veil" aria-hidden="true"></div>
+<main class="scene">
+<img class="guardian" id="guardian" alt="">
+<section class="card state-ready" id="card" data-state="ready">
   <div class="eyebrow" id="eyebrow"></div>
   <div class="progress" role="progressbar" aria-label="Question progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="bar"></span></div>
   <h1 id="question">Loading the forest…</h1>
@@ -52,10 +65,14 @@ h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-heig
   <div class="choices" id="choices" role="radiogroup" aria-labelledby="question"></div>
   <p class="status" id="status" role="status" aria-live="polite"></p>
   <div class="meta"><span id="metaStart"></span><span id="metaEnd"></span></div>
+</section>
 </main>
 <script src="rabbitQuestionView.js"></script>
 <script>
 const card=document.getElementById('card');
+const scene=card.parentElement;
+const environment=document.getElementById('environment');
+const guardian=document.getElementById('guardian');
 const eyebrow=document.getElementById('eyebrow');
 const bar=document.getElementById('bar');
 const progress=bar.parentElement;
@@ -81,6 +98,10 @@ const render=view=>{
   text(metaEnd,view.meta[1]);
   bar.style.width=view.progress.percent+'%';
   progress.setAttribute('aria-valuenow',String(view.progress.percent));
+  const hour=new Date().getHours();
+  environment.src=hour>=6&&hour<18?view.artwork.environmentDay:view.artwork.environmentNight;
+  if(view.artwork.guardian){guardian.src=view.artwork.guardian;guardian.alt=view.artwork.guardianAlt;guardian.classList.add('visible');scene.classList.add('has-guardian')}
+  else{guardian.removeAttribute('src');guardian.alt='';guardian.classList.remove('visible');scene.classList.remove('has-guardian')}
   choices.replaceChildren();
   view.choices.forEach(item=>{
     const button=document.createElement('button');

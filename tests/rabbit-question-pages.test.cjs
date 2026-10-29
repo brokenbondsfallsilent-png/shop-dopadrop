@@ -43,6 +43,7 @@ test('Forest exposes one authenticated safe stage and no generated button IDs', 
     assert.doesNotMatch(source, /comp-mvl0wln1|comp-mvl101pj|comp-mvl11a5p/);
     assert.match(source, /choiceMap\.get\(action\.choiceId\)/);
     assert.match(source, /forestEncounter\(choice\.characterId,\s*choice\.actionId\)/);
+    assert.match(source, /guardianKey:\s*view\.guardian\?\.id/);
 });
 
 test('Forest refreshes the authoritative stage after success or stale action', () => {
@@ -69,6 +70,7 @@ test('Cave renders authoritative dialogue and removes generated button IDs', () 
     assert.match(source, /result\.dialogue/);
     assert.match(source, /dialogue\?\.choices[\s\S]*\.map/);
     assert.match(source, /chooseLootgrem\(currentNode,\s*action\.choiceId\)/);
+    assert.match(source, /guardianKey:\s*'tanglebright'/);
 });
 
 test('Cave maps next dialogue, terminal choices and locked access safely', () => {

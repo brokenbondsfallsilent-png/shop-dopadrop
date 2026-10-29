@@ -9,6 +9,20 @@
         'ready', 'pending', 'correct', 'incorrect', 'locked', 'completed', 'error', 'limited'
     ]);
     const IDENTIFIER = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
+    const ENVIRONMENTS = Object.freeze({
+        daily: 'assets/rabbit-hole/daily-tavern-v4.webp',
+        forest: 'assets/rabbit-hole/forest-night-v3.webp',
+        cave: 'assets/rabbit-hole/cave-environment-v4.webp'
+    });
+    const DAY_ENVIRONMENTS = Object.freeze({
+        forest: 'assets/rabbit-hole/forest-day-v3.webp'
+    });
+    const GUARDIANS = Object.freeze({
+        mothkeeper: ['assets/rabbit-hole/mothkeeper.webp', 'Mothkeeper, guardian of the Rabbit Hole'],
+        rootwhisper: ['assets/rabbit-hole/rootwhisper-v7.webp', 'Rootwhisper, guardian of the Rabbit Hole'],
+        grumblebark: ['assets/rabbit-hole/grumblebark-v2.webp', 'Grumblebark, guardian of the Rabbit Hole'],
+        tanglebright: ['assets/rabbit-hole/tanglebright-v4.webp', 'Tanglebright, guardian of the Rabbit Hole']
+    });
 
     function cleanText(value, maximum = 500) {
         return typeof value === 'string' ? value.trim().slice(0, maximum) : '';
@@ -40,6 +54,7 @@
         const meta = Array.isArray(snapshot.meta)
             ? snapshot.meta.map(value => cleanText(value, 100)).filter(Boolean).slice(0, 2)
             : [];
+        const guardian = GUARDIANS[cleanText(snapshot.guardianKey, 64).toLowerCase()] || null;
 
         return {
             valid: true,
@@ -51,6 +66,13 @@
             choices: choices.map(choice => ({ ...choice, disabled })),
             meta,
             status: { kind: statusKind, message: cleanText(snapshot.status?.message, 500) },
+            artwork: {
+                environment: ENVIRONMENTS[snapshot.mode],
+                environmentDay: DAY_ENVIRONMENTS[snapshot.mode] || ENVIRONMENTS[snapshot.mode],
+                environmentNight: ENVIRONMENTS[snapshot.mode],
+                guardian: guardian ? guardian[0] : null,
+                guardianAlt: guardian ? guardian[1] : ''
+            },
             disabled
         };
     }

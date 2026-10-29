@@ -283,6 +283,13 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
     assert.match(source, /@media\s*\(max-width:\s*600px\)/);
     assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*grid-template-columns:\s*1fr/);
     assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*border-left:\s*4px solid/);
+    assert.match(source, /id="environment"/);
+    assert.match(source, /id="guardian"/);
+    assert.match(source, /view\.artwork\.environment/);
+    assert.match(source, /view\.artwork\.guardian/);
+    assert.match(source, /scene\.classList\.add\('has-guardian'\)/);
+    assert.match(source, /scene\.classList\.remove\('has-guardian'\)/);
+    assert.match(source, /prefers-reduced-motion/);
 
     for (const state of ['ready', 'pending', 'correct', 'incorrect', 'locked', 'completed', 'error', 'limited']) {
         assert.match(source, new RegExp(`data-state="${state}"|state-${state}`));
@@ -295,6 +302,12 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
 test('shared question assets preserve served parity and reward reset safeguards', () => {
     assert.equal(read('docs/rabbit-question.html'), read('src/public/rabbit-question.html'));
     assert.equal(read('docs/rabbitQuestionView.js'), read('src/public/rabbitQuestionView.js'));
+    for (const file of ['daily-tavern-v4.webp', 'forest-day-v3.webp', 'forest-night-v3.webp', 'cave-environment-v4.webp', 'mothkeeper.webp', 'rootwhisper-v7.webp', 'grumblebark-v2.webp', 'tanglebright-v4.webp']) {
+        assert.deepEqual(
+            fs.readFileSync(path.join(root, 'docs/assets/rabbit-hole', file)),
+            fs.readFileSync(path.join(root, 'src/public/assets/rabbit-hole', file))
+        );
+    }
 
     const backend = read('src/backend/rabbitHole.web.js');
     const pages = [
