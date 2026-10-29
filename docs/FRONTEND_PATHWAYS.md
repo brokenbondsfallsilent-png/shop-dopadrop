@@ -8,6 +8,7 @@ This is the implementation map for storefront navigation, visible controls and t
 | --- | --- | --- |
 | Homepage embed | `#html3` and `shop-dopadrop-home-current.html` | Homepage visuals, catalogue cards, collection cards and hidden discoveries 1–4 |
 | Shared Rabbit Hole launcher | `#html2` and `rabbit-widget.html` | The single visible gem, progress summary and links to Cave, Forest and Daily |
+| Shared Rabbit Hole questions | `#rabbitQuestionView`, `rabbit-question.html` and `rabbitQuestionBridge.js` | B1 Neon Tiles rendering for Daily, all four Forest guardians and Cave dialogue; page controllers retain authentication and backend authority |
 | Wix native pages | `rabbitDiscovery.js` and page controllers | Authenticated discoveries 5–50 on audited collection, content, policy, member and adventure routes |
 
 The homepage's internal Rabbit Hole HUD stays hidden. The shared header is the only visible launcher.
@@ -36,7 +37,7 @@ Daily riddle submissions are guarded per member and day. Six incorrect answers a
 
 The 30-day campaign content is validated when the backend module initializes. It must contain exactly thirty sequential entries with non-blank titles, teasers and prompts, three unique visible choices, unique titles and an answer present among those choices. Invalid content fails closed before it can be served. Release-day calculation is pinned to the Australia/Sydney calendar and capped at day thirty.
 
-Successful daily riddles and forest encounters also synchronize trusted private DopaVerse activity. Unique valid completed days set the monotonic `riddlesSolved` total, while only the complete ordered Mothkeeper, Rootwhisper and Tanglebright encounter sequence records one completed quest chain. These writes grant no XP or staff permissions, and a profile-sync failure is logged without undoing already-saved Rabbit Hole progress.
+Successful daily riddles and forest encounters also synchronize trusted private DopaVerse activity. Unique valid completed days set the monotonic `riddlesSolved` total, while only the complete ordered Mothkeeper, Rootwhisper, Grumblebark and Tanglebright encounter sequence records one completed quest chain. These writes grant no XP or staff permissions, and a profile-sync failure is logged without undoing already-saved Rabbit Hole progress.
 
 ### Rabbit Hole
 
@@ -45,7 +46,9 @@ Successful daily riddles and forest encounters also synchronize trusted private 
 - The gem opens one dialog and returns focus when it closes.
 - Escape closes the dialog.
 - The cave control remains visibly disabled until `caveUnlocked` is returned by the trusted backend state.
-- Forest and Daily routes have Wix page controllers and member gates.
+- Forest, Daily and Cave routes have Wix page controllers, signed-in-member gates and the shared `#rabbitQuestionView` editor contract.
+- Question choices render as a two-column Neon Tiles grid on desktop/tablet and a full-width neon-edged stack at 600 pixels and below.
+- The renderer accepts display-safe snapshots only; its allowlisted actions return to the authenticated page controller before any backend call.
 - The public widget has no progress-reset control.
 - No member-callable backend progress-reset method is exposed.
 - The Cave page cannot directly issue a live reward.

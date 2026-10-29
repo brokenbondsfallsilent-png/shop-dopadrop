@@ -292,3 +292,18 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
     assert.doesNotMatch(source, /claimReward|resetHuntState|memberId|rewardChoice/);
 });
 
+test('shared question assets preserve served parity and reward reset safeguards', () => {
+    assert.equal(read('docs/rabbit-question.html'), read('src/public/rabbit-question.html'));
+    assert.equal(read('docs/rabbitQuestionView.js'), read('src/public/rabbitQuestionView.js'));
+
+    const backend = read('src/backend/rabbitHole.web.js');
+    const pages = [
+        read('src/pages/Rabbit Hole Daily.i6ju2.js'),
+        read('src/pages/Rabbit Hole Forest.l4tqi.js'),
+        read('src/pages/Rabbit Hole Cave.zoimi.js')
+    ].join('\n');
+    assert.match(backend, /const REWARD_ISSUANCE_ENABLED = false/);
+    assert.doesNotMatch(backend, /export const resetHuntState/);
+    assert.doesNotMatch(pages, /claimReward|resetHuntState/);
+});
+
