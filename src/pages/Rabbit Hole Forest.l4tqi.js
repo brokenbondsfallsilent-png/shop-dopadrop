@@ -3,7 +3,11 @@ import { forestEncounter, getForestContent } from 'backend/rabbitHole.web';
 import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
 import { bindRabbitQuestionView } from 'public/rabbitQuestionBridge';
 
-$w.onReady(() => bindRabbitDiscovery($w));
+let reloadForestQuestion = async () => {};
+
+$w.onReady(() => bindRabbitDiscovery($w, {
+    onFound: () => reloadForestQuestion()
+}));
 
 $w.onReady(async () => {
     if (!(await authentication.loggedIn())) {
@@ -55,7 +59,7 @@ $w.onReady(async () => {
 
     const load = async () => snapshot(await getForestContent());
 
-    bindRabbitQuestionView($w, {
+    const questionView = bindRabbitQuestionView($w, {
         load,
         submit: async action => {
             const choice = choiceMap.get(action.choiceId);
@@ -85,5 +89,6 @@ $w.onReady(async () => {
             message: 'The guardian could not hear that choice. Please try again.'
         })
     });
+    reloadForestQuestion = questionView.reload;
 });
 

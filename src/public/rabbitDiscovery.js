@@ -18,7 +18,7 @@ function setStatus($w, message) {
     if (status) status.text = message;
 }
 
-export async function bindRabbitDiscovery($w) {
+export async function bindRabbitDiscovery($w, options = {}) {
     const button = optionalElement($w, '#rabbitDiscoveryButton');
     if (!button) {
         console.warn('Rabbit discovery editor element is missing on this Wix page.');
@@ -71,6 +71,7 @@ export async function bindRabbitDiscovery($w) {
                 ? 'All 50 discoveries are complete. Tanglebright is waiting.'
                 : `Discovery ${result.found} of ${result.required} saved.`);
             const nextState = await getHuntState();
+            if (typeof options.onFound === 'function') await options.onFound(result, nextState);
             if (nextState.nextPage === route) activate(nextState);
             else button.collapse();
         } catch (error) {
