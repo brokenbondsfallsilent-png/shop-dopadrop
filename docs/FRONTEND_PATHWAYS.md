@@ -6,9 +6,9 @@ This is the implementation map for storefront navigation, visible controls and t
 
 | Surface | Owner | Responsibilities |
 | --- | --- | --- |
-| Homepage embed | `#html3` and `shop-dopadrop-home-current.html` | Homepage visuals, catalogue cards, collection cards and the 50 hidden hunt objects |
+| Homepage embed | `#html3` and `shop-dopadrop-home-current.html` | Homepage visuals, catalogue cards, collection cards and hidden discoveries 1–4 |
 | Shared Rabbit Hole launcher | `#html2` and `rabbit-widget.html` | The single visible gem, progress summary and links to Cave, Forest and Daily |
-| Wix native pages | Wix page controllers | Product, collection, cart, checkout, account, policy and Rabbit Hole destination pages |
+| Wix native pages | `rabbitDiscovery.js` and page controllers | Authenticated discoveries 5–50 on audited collection, content, policy, member and adventure routes |
 
 The homepage's internal Rabbit Hole HUD stays hidden. The shared header is the only visible launcher.
 
@@ -49,6 +49,9 @@ Successful daily riddles and forest encounters also synchronize trusted private 
 - The public widget has no progress-reset control.
 - No member-callable backend progress-reset method is exposed.
 - The Cave page cannot directly issue a live reward.
+- The canonical placement registry contains exactly 50 ordered IDs. IDs 1–4 stay in the homepage embed; IDs 5–50 use a reusable native `#rabbitDiscoveryButton` contract on the owning Wix page or template.
+- Guardian encounters unlock at unique discovery counts 20 Mothkeeper, 30 Rootwhisper, 40 Grumblebark and 50 Tanglebright.
+- Native editor placement remains a Wix Studio task; missing elements fail safely and are listed in `HIDDEN_BUTTON_PLACEMENTS.md`.
 
 ## Backend challenge verification
 

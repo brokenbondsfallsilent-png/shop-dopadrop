@@ -1,3 +1,6 @@
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));
 $w.onReady(function () {
     $w('Text').forEach(element => {
         if ((element.text || '').includes('All the latest from Visuelle')) {

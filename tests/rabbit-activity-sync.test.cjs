@@ -16,7 +16,7 @@ test('the full forest encounter sequence becomes one completed quest chain', () 
     const facts = rabbitActivityFacts({
         forestState: {
             completedDays: [],
-            encounters: ['mothkeeper:wait', 'rootwhisper:protect', 'tanglebright:approach']
+            encounters: ['mothkeeper:wait', 'rootwhisper:protect', 'grumblebark:listen', 'tanglebright:approach']
         }
     });
 

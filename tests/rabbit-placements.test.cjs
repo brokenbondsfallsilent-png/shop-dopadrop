@@ -1,0 +1,94 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const root = path.resolve(__dirname, '..');
+const read = relativePath => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const {
+    GUARDIAN_MILESTONES,
+    HUNT_PLACEMENTS,
+    HUNT_ROUTE,
+    TOTAL_BUTTONS
+} = require('../src/backend/rabbitContent.js');
+
+test('all fifty discoveries have one ordered placement on audited real routes', () => {
+    assert.equal(TOTAL_BUTTONS, 50);
+    assert.equal(HUNT_PLACEMENTS.length, 50);
+    assert.deepEqual(HUNT_PLACEMENTS.map(placement => placement.buttonId),
+        Array.from({ length: 50 }, (_, index) => index + 1));
+    assert.equal(new Set(HUNT_PLACEMENTS.map(placement => placement.buttonId)).size, 50);
+    assert.deepEqual(HUNT_ROUTE, HUNT_PLACEMENTS.map(placement => placement.route));
+    for (const placement of HUNT_PLACEMENTS) {
+        assert.match(placement.route, /^\/(?!\/)/);
+        assert.ok(placement.surface);
+        assert.ok(placement.anchor);
+        assert.ok(placement.editorElementId);
+    }
+});
+
+test('placement distribution uses real storefront, support, policy, member and adventure routes', () => {
+    const routes = new Set(HUNT_PLACEMENTS.map(placement => placement.route));
+    for (const route of [
+        '/', '/category/all-products', '/category/desk-workspace-fidgets',
+        '/category/movement-balance', '/about', '/contact', '/shipping-policy',
+        '/refund-policy', '/privacy-policy', '/profile/my/profile', '/my-orders',
+        '/account-settings', '/notifications', '/rabbit-hole-forest',
+        '/rabbit-hole-daily', '/blog', '/gift-card', '/accessibility-statement'
+    ]) assert.ok(routes.has(route), `${route} has no discovery placement`);
+    assert.equal(HUNT_PLACEMENTS.filter(item => item.route === '/').length, 4);
+    assert.equal(HUNT_PLACEMENTS.filter(item => item.route === '/category/all-products').length, 3);
+    assert.equal(HUNT_PLACEMENTS.filter(item => item.surface === 'collection').length, 24);
+    assert.equal(HUNT_PLACEMENTS.filter(item => item.surface === 'member').length, 4);
+});
+
+test('guardian milestones are Mothkeeper 20, Rootwhisper 30, Grumblebark 40 and Tanglebright 50', () => {
+    assert.deepEqual(GUARDIAN_MILESTONES.map(({ threshold, characterId, actionId }) => ({ threshold, characterId, actionId })), [
+        { threshold: 20, characterId: 'mothkeeper', actionId: 'wait' },
+        { threshold: 30, characterId: 'rootwhisper', actionId: 'protect' },
+        { threshold: 40, characterId: 'grumblebark', actionId: 'listen' },
+        { threshold: 50, characterId: 'tanglebright', actionId: 'approach' }
+    ]);
+});
+
+test('native route templates bind the reusable authenticated discovery control', () => {
+    const bindings = [
+        'src/pages/Category Page.jqjf7.js', 'src/pages/About.h2wml.js',
+        'src/pages/Contact.sdtlj.js', 'src/pages/Shipping policy.rrbon.js',
+        'src/pages/Refund Policy.pf6as.js', 'src/pages/Privacy Policy.wcw8y.js',
+        'src/pages/Profile.nqcgq.js', 'src/pages/My Orders.ofgf2.js',
+        'src/pages/Account Settings.e3juj.js', 'src/pages/Notifications.u2bgt.js',
+        'src/pages/Rabbit Hole Forest.l4tqi.js', 'src/pages/Rabbit Hole Daily.i6ju2.js',
+        'src/pages/Blog.ejdl4.js', 'src/pages/GIFT CARD.t7j18.js',
+        'src/pages/Accessibility Statement.ymbtc.js'
+    ];
+    for (const controller of bindings) {
+        assert.match(read(controller), /bindRabbitDiscovery/,
+            `${controller} does not bind the discovery control`);
+    }
+    const helper = read('src/public/rabbitDiscovery.js');
+    assert.match(helper, /#rabbitDiscoveryButton/);
+    assert.match(helper, /authentication\.promptLogin/);
+    assert.match(helper, /beginButtonChallenge/);
+    assert.match(helper, /findButton/);
+    assert.doesNotMatch(helper, /resetHuntState|claimReward/);
+});
+
+test('the homepage embed owns only discoveries one through four', () => {
+    const home = read('src/public/shop-dopadrop-home-current.html');
+    const served = read('docs/index.html');
+    assert.match(home, /slice\(0,4\)/);
+    assert.match(served, /slice\(0,4\)/);
+    assert.doesNotMatch(home, /slice\(0,50\)/);
+});
+
+test('the first homepage discovery opens the Wix member signup gate', () => {
+    const home = read('src/public/shop-dopadrop-home-current.html');
+    assert.match(home, /memberReady!==true\)\{send\(\{type:'RABBIT_LOGIN_REQUEST'\}\)/);
+});
+
+test('reward issuance stays disabled and no public reset method is introduced', () => {
+    const backend = read('src/backend/rabbitHole.web.js');
+    assert.match(backend, /const REWARD_ISSUANCE_ENABLED = false/);
+    assert.doesNotMatch(backend, /export const resetHuntState/);
+});

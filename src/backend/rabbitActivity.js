@@ -1,6 +1,7 @@
 const FOREST_SEQUENCE = Object.freeze([
     'mothkeeper:wait',
     'rootwhisper:protect',
+    'grumblebark:listen',
     'tanglebright:approach'
 ]);
 

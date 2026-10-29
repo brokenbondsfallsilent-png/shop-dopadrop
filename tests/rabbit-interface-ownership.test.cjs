@@ -30,8 +30,8 @@ test('Wix embeds use the current hosted asset cache revision', () => {
     const masterSource = read('src/pages/masterPage.js');
     const homeSource = read('src/pages/Home.c1dmp.js');
 
-    assert.match(masterSource, /rabbit-widget\.html\?v=f956b0a/);
-    assert.match(homeSource, /shop-dopadrop\/\?v=f956b0a/);
+    assert.match(masterSource, /rabbit-widget\.html\?v=rabbit50-20261029/);
+    assert.match(homeSource, /shop-dopadrop\/\?v=rabbit50-20261029/);
 });
 
 test('the embedded Home header owns one account link and native member bars are removed', () => {
@@ -75,7 +75,7 @@ test('the cave page cannot directly issue a live reward', () => {
     assert.match(source, /chooseLootgrem\('reward', 'claim'\)/);
 });
 
-test('the compact widget has one complete document and no duplicate sign-in control', () => {
+test('the compact widget has one complete document and one small login control', () => {
     const source = read('src/public/rabbit-widget.html');
     const servedSource = read('docs/rabbit-widget.html');
 
@@ -83,8 +83,10 @@ test('the compact widget has one complete document and no duplicate sign-in cont
     assert.equal((source.match(/<\/html>/gi) || []).length, 1);
     assert.equal((source.match(/<script(?:\s|>)/gi) || []).length, 2);
     assert.equal((source.match(/<\/script>/gi) || []).length, 2);
-    assert.doesNotMatch(source, /id=["']s["']/);
-    assert.doesNotMatch(source, /send\('sign-in'\)/);
+    assert.equal((source.match(/id=["']login["']/g) || []).length, 1);
+    assert.match(source, /class="login"/);
+    assert.match(source, /\.login\{[^}]*font-size:10px/);
+    assert.match(source, /document\.getElementById\('login'\)\.onclick=\(\)=>send\('sign-in'\)/);
 });
 
 test('the compact widget cannot reset hunt progress and exposes dialog state', () => {
@@ -177,7 +179,7 @@ test('the member dashboard renders when window.status is the browser status stri
         title: ''
     });
     const elements = Object.fromEntries(
-        ['g', 'p', 'x', 'xp', 'count', 'forest', 'daily', 'reward', 'n', 'bar', 'c', 'f', 'd', 'dashboard', 'rank', 'identity', 'status']
+        ['g', 'p', 'x', 'login', 'xp', 'count', 'forest', 'daily', 'reward', 'n', 'bar', 'c', 'f', 'd', 'dashboard', 'rank', 'identity', 'status']
             .map(id => [id, makeElement(...(id === 'dashboard' ? ['dashboard', 'loading'] : []))])
     );
     const parent = { postMessage() {} };
@@ -226,5 +228,40 @@ test('source and served mobile decoration bands clip transformed artwork', () =>
 
     assert.match(source, /\.art-sprinkles\{[^}]*overflow:hidden/);
     assert.match(servedSource, /\.art-sprinkles\{[^}]*overflow:hidden/);
+});
+
+test('storefront route buttons have real destinations outside the Wix iframe', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /const STOREFRONT_ORIGIN='https:\/\/www\.shop--dopadrop\.com\.au'/);
+        assert.match(html, /a\.href=storefrontHref\(route\)/);
+        assert.match(html, /if\(window\.parent===window\)return true/);
+        assert.match(html, /send\(\{type:'SHOP_DOPA_NAVIGATE',path:route\}\)/);
+    }
+});
+
+test('the embedded Account control opens Wix login instead of navigating to a dead public profile URL', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /route==='\/profile\/my\/profile'/);
+        assert.match(html, /a\.href=STOREFRONT_ORIGIN/);
+        assert.match(html, /send\(\{type:'RABBIT_LOGIN_REQUEST'\}\)/);
+    }
+});
+
+test('the standalone homepage mounts the gem while the Wix hunt iframe leaves it to the shared header', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /if\(window\.parent!==window\)return/);
+        assert.match(html, /iframe\.src='rabbit-widget\.html'/);
+        assert.match(html, /iframe\.title='Rabbit Hole member dashboard'/);
+        assert.match(html, /iframe\.className='standalone-gem'/);
+    }
 });
 

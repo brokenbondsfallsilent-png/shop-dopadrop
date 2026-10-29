@@ -1,3 +1,6 @@
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));
 $w.onReady(function () {
     $w('#text88').customClassList.add('dopa-story');
     $w('#section5').customClassList.add('dopa-story-section');

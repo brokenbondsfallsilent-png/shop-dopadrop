@@ -1,5 +1,8 @@
 import wixLocationFrontend from 'wix-location-frontend';
 import { getCollectionNaming } from 'public/dopaNaming';
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));
 
 $w.onReady(function () {
     const identity = getCollectionNaming(wixLocationFrontend.path);

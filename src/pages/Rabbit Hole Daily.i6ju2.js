@@ -1,5 +1,8 @@
 import { authentication } from 'wix-members-frontend';
 import { getDailyContent, solveDailyContent } from 'backend/rabbitHole.web';
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));
 
 $w.onReady(async () => {
     if (!(await authentication.loggedIn())) {

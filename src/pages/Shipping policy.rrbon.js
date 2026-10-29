@@ -1,3 +1,6 @@
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));
 const policyRows = [
   {
     "_id": "delivery",

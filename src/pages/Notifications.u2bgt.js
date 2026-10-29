@@ -8,3 +8,6 @@ $w.onReady(function () {
 
     // Click 'Preview' to run your code
 });
+import { bindRabbitDiscovery } from 'public/rabbitDiscovery';
+
+$w.onReady(() => bindRabbitDiscovery($w));

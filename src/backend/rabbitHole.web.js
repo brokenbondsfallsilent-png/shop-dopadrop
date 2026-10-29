@@ -169,7 +169,7 @@ export const forestEncounter = webMethod(Permissions.SiteMember, async (characte
     if (!encounter) throw new Error('UNKNOWN_FOREST_ENCOUNTER');
     const key = `${characterId}:${actionId}`;
     const forest = state.forestState;
-    const sequence = ['mothkeeper:wait', 'rootwhisper:protect', 'tanglebright:approach'];
+    const sequence = ['mothkeeper:wait', 'rootwhisper:protect', 'grumblebark:listen', 'tanglebright:approach'];
     const expected = sequence[forest.encounters.length];
     if (key !== expected) throw new Error('FOREST_PREDECESSOR_REQUIRED');
     if (forest.encounters.includes(key)) throw new Error('ENCOUNTER_ALREADY_RECORDED');

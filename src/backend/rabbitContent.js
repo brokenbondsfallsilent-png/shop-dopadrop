@@ -1,35 +1,63 @@
 export const TOTAL_BUTTONS = 50;
 export const REWARD_POINTS = 500;
 export const LOOTGREM_CHECKOUT_CODE = 'LOOTGREM';
-export const HUNT_STAGES = [
-    { threshold: 20, label: 'FIRST FOREST ENCOUNTER', difficulty: 'NORMAL' },
-    { threshold: 30, label: 'SECOND FOREST ENCOUNTER', difficulty: 'HARDER' },
-    { threshold: 40, label: 'THIRD FOREST ENCOUNTER', difficulty: 'EXTREME' },
-    { threshold: 50, label: 'TANGLEBRIGHT', difficulty: 'IMPOSSIBLE' }
+export const GUARDIAN_MILESTONES = [
+    { threshold: 20, label: 'MOTHKEEPER', characterId: 'mothkeeper', actionId: 'wait', difficulty: 'NORMAL' },
+    { threshold: 30, label: 'ROOTWHISPER', characterId: 'rootwhisper', actionId: 'protect', difficulty: 'HARDER' },
+    { threshold: 40, label: 'GRUMBLEBARK', characterId: 'grumblebark', actionId: 'listen', difficulty: 'EXTREME' },
+    { threshold: 50, label: 'TANGLEBRIGHT', characterId: 'tanglebright', actionId: 'approach', difficulty: 'IMPOSSIBLE' }
 ];
+export const HUNT_STAGES = GUARDIAN_MILESTONES;
 export const CAMPAIGN_START = '2026-10-30';
 
-// The hunt is a relay, not a single-page gallery. Each ordinal belongs to
-// exactly one destination page; the member may only claim the next ordinal
-// when the current page matches this route.
-export const HUNT_ROUTE = [
-    '/','/about','/category/all-products','/category/best-sellers','/gift-card',
-    '/blog','/contact','/category/desk-workspace-fidgets','/category/hand-fidgets-spinners',
-    '/category/sensory-rings-chains-wearables','/category/chew-oral-sensory',
-    '/category/tactile-textured-sensory','/category/weighted-deep-pressure',
-    '/category/visual-light-stimulation','/category/auditory-rhythm-tools',
-    '/category/focus-calm-tools','/category/stim-toys-squishies',
-    '/category/sensory-kits-bundles','/category/movement-balance','/category/puzzles-hands-on-play',
-    '/shipping-policy','/refund-policy','/privacy-policy','/terms-and-conditions',
-    '/accessibility-statement','/category/all-products','/about','/contact','/blog','/gift-card',
-    '/category/best-sellers','/category/desk-workspace-fidgets','/category/hand-fidgets-spinners',
-    '/category/sensory-rings-chains-wearables','/category/chew-oral-sensory',
-    '/category/tactile-textured-sensory','/category/weighted-deep-pressure',
-    '/category/visual-light-stimulation','/category/auditory-rhythm-tools',
-    '/category/focus-calm-tools','/category/stim-toys-squishies',
-    '/category/sensory-kits-bundles','/category/movement-balance','/category/puzzles-hands-on-play',
-    '/','/about','/category/all-products','/contact','/blog','/gift-card'
-];
+const placements = [];
+const place = (route, surface, anchor, editorElementId = 'rabbitDiscoveryButton') => {
+    placements.push(Object.freeze({
+        buttonId: placements.length + 1,
+        route,
+        surface,
+        anchor,
+        editorElementId
+    }));
+};
+
+// Audited against the Velo page modules and preserved catalogue slugs in this
+// checkout. Native Wix elements are deliberately represented as an editor
+// contract: source can bind them, but only Wix Studio can place them on canvas.
+['hero artwork', 'featured products', 'collection trail', 'founder invitation']
+    .forEach((anchor, index) => place('/', 'home', anchor, `home-sprinkle-${index + 1}`));
+['shop-all heading', 'catalogue midpoint', 'catalogue footer']
+    .forEach(anchor => place('/category/all-products', 'shop-all', anchor));
+[
+    'desk-workspace-fidgets', 'hand-fidgets-spinners', 'sensory-rings-chains-wearables',
+    'chew-oral-sensory', 'tactile-textured-sensory', 'weighted-deep-pressure',
+    'visual-light-stimulation', 'auditory-rhythm-tools', 'focus-calm-tools',
+    'stim-toys-squishies', 'sensory-kits-bundles', 'movement-balance'
+].forEach(slug => {
+    place(`/category/${slug}`, 'collection', `${slug} heading`);
+    place(`/category/${slug}`, 'collection', `${slug} product grid`);
+});
+['founder story opening', 'origin story midpoint', 'welcome home sign-off']
+    .forEach(anchor => place('/about', 'about', anchor));
+['support introduction', 'help choosing section', 'contact sign-off']
+    .forEach(anchor => place('/contact', 'support', anchor));
+place('/shipping-policy', 'policy', 'tracking section');
+place('/refund-policy', 'policy', 'refunds section');
+place('/privacy-policy', 'policy', 'privacy promise');
+place('/profile/my/profile', 'member', 'profile summary');
+place('/my-orders', 'member', 'orders summary');
+place('/account-settings', 'member', 'account settings footer');
+place('/notifications', 'member', 'notifications footer');
+place('/rabbit-hole-forest', 'adventure', 'forest path');
+place('/rabbit-hole-daily', 'adventure', 'daily chronicle');
+place('/blog', 'adventure', 'brain dump archive');
+place('/gift-card', 'adventure', 'gift card artwork');
+place('/accessibility-statement', 'adventure', 'accessibility promise');
+place('/rabbit-hole-forest', 'adventure', 'Tanglebright threshold');
+
+if (placements.length !== TOTAL_BUTTONS) throw new Error('HUNT_PLACEMENT_COUNT_INVALID');
+export const HUNT_PLACEMENTS = Object.freeze(placements);
+export const HUNT_ROUTE = Object.freeze(HUNT_PLACEMENTS.map(placement => placement.route));
 
 export const LOOTGREM_DIALOGUE = {
     welcome: {
@@ -92,6 +120,13 @@ export const FOREST_ENCOUNTERS = {
         actions: {
             protect: { line: 'You shield a tiny shoot from the cold.', affinity: 2, fragment: 'Seed Promise' },
             explore: { line: 'You follow a root toward the dark.', affinity: 1, fragment: 'Root Map' }
+        }
+    },
+    grumblebark: {
+        name: 'Grumblebark, keeper of the Lowwood',
+        actions: {
+            listen: { line: 'You stay quiet while Grumblebark tells the roots what the storm forgot.', affinity: 2, fragment: 'Lowwood Echo' },
+            answer: { line: 'You answer the old bark with a promise to tread gently.', affinity: 1, fragment: 'Bark Promise' }
         }
     },
     tanglebright: {
