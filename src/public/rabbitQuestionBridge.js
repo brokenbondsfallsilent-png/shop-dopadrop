@@ -28,6 +28,7 @@ export function bindRabbitQuestionView($w, options = {}) {
 
     const seenRequests = new Set();
     let ready = false;
+    let inFlight = false;
     view.src = QUESTION_VIEW_URL;
 
     const post = (type, requestId, payload) => view.postMessage({ type, requestId, payload });
@@ -49,13 +50,16 @@ export function bindRabbitQuestionView($w, options = {}) {
         }
 
         const action = safeAction(data);
-        if (!action || seenRequests.has(action.requestId)) return;
+        if (!ready || inFlight || !action || seenRequests.has(action.requestId)) return;
         seenRequests.add(action.requestId);
+        inFlight = true;
         try {
             const result = await options.submit(action);
             post('RABBIT_QUESTION_RESULT', action.requestId, options.mapResult(result, action));
         } catch (error) {
             post('RABBIT_QUESTION_RESULT', action.requestId, options.mapError(error, action));
+        } finally {
+            inFlight = false;
         }
     });
 

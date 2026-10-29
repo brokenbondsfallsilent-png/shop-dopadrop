@@ -53,6 +53,8 @@ test('Forest refreshes the authoritative stage after success or stale action', (
     assert.match(source, /FOREST_STAGE_LOCKED/);
     assert.match(source, /result\.next/);
     assert.match(source, /Grumblebark|guardian\.label/);
+    assert.match(source, /result\.next\.locked[\s\S]*kind:\s*'locked'/);
+    assert.match(source, /if \(!view\)[\s\S]*FOREST_VIEW_UNAVAILABLE/);
 });
 
 test('Cave renders authoritative dialogue and removes generated button IDs', () => {

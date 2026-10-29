@@ -45,25 +45,25 @@ Buttons 1–4 are implemented inside the homepage HTML component. Buttons 5–50
 | 29 | `/category/sensory-kits-bundles` | Collection | Product grid | Category controller | Same template element, blocked |
 | 30 | `/category/movement-balance` | Collection | Heading | Category controller | Category template element blocked; unlocks Rootwhisper |
 | 31 | `/category/movement-balance` | Collection | Product grid | Category controller | Same template element, blocked |
-| 32 | `/about` | About | Founder story opening | About controller | `#rabbitDiscoveryButton` placement blocked |
-| 33 | `/about` | About | Origin story midpoint | About controller | Same page element, blocked |
-| 34 | `/about` | About | Welcome-home sign-off | About controller | Same page element, blocked |
-| 35 | `/contact` | Support | Support introduction | Contact controller | `#rabbitDiscoveryButton` placement blocked |
-| 36 | `/contact` | Support | Help-choosing section | Contact controller | Same page element, blocked |
-| 37 | `/contact` | Support | Contact sign-off | Contact controller | Same page element, blocked |
-| 38 | `/shipping-policy` | Policy | Tracking section | Shipping controller | `#rabbitDiscoveryButton` placement blocked |
-| 39 | `/refund-policy` | Policy | Refunds section | Refund controller | `#rabbitDiscoveryButton` placement blocked |
-| 40 | `/privacy-policy` | Policy | Privacy promise | Privacy controller | `#rabbitDiscoveryButton` placement blocked; unlocks Grumblebark |
+| 32 | `/about` | About | Founder story opening | About controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 33 | `/about` | About | Origin story midpoint | About controller | Same draft page element placed |
+| 34 | `/about` | About | Welcome-home sign-off | About controller | Same draft page element placed |
+| 35 | `/contact` | Support | Support introduction | Contact controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 36 | `/contact` | Support | Help-choosing section | Contact controller | Same draft page element placed |
+| 37 | `/contact` | Support | Contact sign-off | Contact controller | Same draft page element placed |
+| 38 | `/shipping-policy` | Policy | Tracking section | Shipping controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 39 | `/refund-policy` | Policy | Refunds section | Refund controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 40 | `/privacy-policy` | Policy | Privacy promise | Privacy controller | `#rabbitDiscoveryButton` placed in draft editor; unlocks Grumblebark |
 | 41 | `/profile/my/profile` | Member | Profile summary | Profile controller | `#rabbitDiscoveryButton` placement blocked |
 | 42 | `/my-orders` | Member | Orders summary | Orders controller | `#rabbitDiscoveryButton` placement blocked |
 | 43 | `/account-settings` | Member | Settings footer | Account Settings controller | `#rabbitDiscoveryButton` placement blocked |
 | 44 | `/notifications` | Member | Notifications footer | Notifications controller | `#rabbitDiscoveryButton` placement blocked |
-| 45 | `/rabbit-hole-forest` | Adventure | Forest path | Forest controller | `#rabbitDiscoveryButton` placement blocked |
-| 46 | `/rabbit-hole-daily` | Adventure | Daily chronicle | Daily controller | `#rabbitDiscoveryButton` placement blocked |
+| 45 | `/rabbit-hole-forest` | Adventure | Forest path | Forest controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 46 | `/rabbit-hole-daily` | Adventure | Daily chronicle | Daily controller | `#rabbitDiscoveryButton` placed in draft editor |
 | 47 | `/blog` | Adventure | Brain Dump archive | Blog controller | `#rabbitDiscoveryButton` placement blocked |
-| 48 | `/gift-card` | Adventure | Gift-card artwork | Gift Card controller | `#rabbitDiscoveryButton` placement blocked |
-| 49 | `/accessibility-statement` | Adventure | Accessibility promise | Accessibility controller | `#rabbitDiscoveryButton` placement blocked |
-| 50 | `/rabbit-hole-forest` | Adventure | Tanglebright threshold | Forest controller | Same page element, blocked; unlocks Tanglebright |
+| 48 | `/gift-card` | Adventure | Gift-card artwork | Gift Card controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 49 | `/accessibility-statement` | Adventure | Accessibility promise | Accessibility controller | `#rabbitDiscoveryButton` placed in draft editor |
+| 50 | `/rabbit-hole-forest` | Adventure | Tanglebright threshold | Forest controller | Same draft page element placed; unlocks Tanglebright |
 
 ## Guardian editor blockers
 
@@ -78,7 +78,8 @@ The Forest page already has wired controls for Mothkeeper, Rootwhisper and Tangl
 
 ## Required Wix Studio placement pass
 
-- Add one initially collapsed `#rabbitDiscoveryButton` to each of these native templates/pages: Category, About, Contact, Shipping Policy, Refund Policy, Privacy Policy, Profile, My Orders, Account Settings, Notifications, Rabbit Hole Forest, Rabbit Hole Daily, Blog, Gift Card and Accessibility Statement.
+- Draft-editor placements are complete on About, Contact, Shipping Policy, Refund Policy, Privacy Policy, Rabbit Hole Forest, Rabbit Hole Daily, Gift Card and Accessibility Statement.
+- Remaining blocked placements are Category, Profile, My Orders, Account Settings, Notifications and Blog. The Wix member/dynamic templates reload and detach the newly inserted control before its ID can be saved; these require a fresh editor pass before publish.
 - Optionally add `#rabbitDiscoveryStatus` next to each button as an accessible status message.
 - On the Category template, position the single reusable control so it works for both the heading and product-grid anchors at desktop and mobile breakpoints; the backend reveals it only for the member's currently assigned ID.
 - Add and wire the missing Grumblebark encounter control on Rabbit Hole Forest.

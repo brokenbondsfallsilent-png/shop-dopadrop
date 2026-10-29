@@ -15,6 +15,19 @@ $w.onReady(async () => {
     let choiceMap = new Map();
 
     const snapshot = (view, status) => {
+        if (!view) {
+            console.error('FOREST_VIEW_UNAVAILABLE');
+            return {
+                mode: 'forest',
+                eyebrow: 'Forest guardians',
+                progress: { current: 0, total: 4 },
+                question: 'The guardian path is temporarily unavailable.',
+                hint: 'Reload this page to try the forest again.',
+                choices: [],
+                meta: ['NO POINTS AWARDED'],
+                status: { kind: 'locked', message: 'The forest could not load safely.' }
+            };
+        }
         stage = view;
         choiceMap = new Map((view.choices || []).map(choice => [choice.id, choice]));
         const guardianNumber = Math.min(view.progress.current + 1, view.progress.total);
@@ -58,9 +71,15 @@ $w.onReady(async () => {
                 throw error;
             }
         },
-        mapResult: result => snapshot(result.next, result.stale
-            ? { kind: 'error', message: 'The forest path changed. The current guardian has been restored.' }
-            : { kind: result.next.completed ? 'completed' : 'correct', message: result.outcome.dialogue }),
+        mapResult: result => snapshot(result.next, result.next.completed
+            ? { kind: 'completed', message: 'All four guardians have opened the cave path.' }
+            : result.next.locked
+                ? { kind: 'locked', message: result.stale
+                    ? 'The forest path changed. Keep discovering hidden buttons to unlock this guardian.'
+                    : `${result.outcome.dialogue} Keep discovering hidden buttons to unlock the next guardian.` }
+                : result.stale
+                    ? { kind: 'error', message: 'The forest path changed. The current guardian has been restored.' }
+                    : { kind: 'correct', message: result.outcome.dialogue }),
         mapError: () => snapshot(stage, {
             kind: 'error',
             message: 'The guardian could not hear that choice. Please try again.'

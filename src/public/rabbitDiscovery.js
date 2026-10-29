@@ -39,12 +39,21 @@ export async function bindRabbitDiscovery($w) {
         return { bound: false, reason: 'STATE_UNAVAILABLE' };
     }
     const route = currentRoute();
-    if (!state.nextButtonId || state.nextPage !== route) return { bound: false, reason: 'NOT_ASSIGNED_HERE' };
-    const buttonId = state.nextButtonId;
+    let buttonId;
     let challenge = null;
-    button.label = 'A tiny forest mark';
-    if (button.accessibility) button.accessibility.ariaLabel = `Hidden forest discovery ${buttonId}`;
-    button.expand();
+    const activate = nextState => {
+        if (!nextState?.nextButtonId || nextState.nextPage !== route) {
+            button.collapse();
+            return false;
+        }
+        buttonId = nextState.nextButtonId;
+        challenge = null;
+        button.label = 'A tiny forest mark';
+        if (button.accessibility) button.accessibility.ariaLabel = `Hidden forest discovery ${buttonId}`;
+        button.expand();
+        return true;
+    };
+    if (!activate(state)) return { bound: false, reason: 'NOT_ASSIGNED_HERE' };
     button.onClick(async () => {
         if (!(await authentication.loggedIn())) {
             await authentication.promptLogin();
@@ -58,10 +67,12 @@ export async function bindRabbitDiscovery($w) {
             }
             const result = await findButton(buttonId, route, challenge.token);
             challenge = null;
-            button.collapse();
             setStatus($w, result.caveUnlocked
                 ? 'All 50 discoveries are complete. Tanglebright is waiting.'
                 : `Discovery ${result.found} of ${result.required} saved.`);
+            const nextState = await getHuntState();
+            if (nextState.nextPage === route) activate(nextState);
+            else button.collapse();
         } catch (error) {
             challenge = null;
             setStatus($w, String(error?.message || error));

@@ -71,6 +71,9 @@ test('native route templates bind the reusable authenticated discovery control',
     assert.match(helper, /authentication\.promptLogin/);
     assert.match(helper, /beginButtonChallenge/);
     assert.match(helper, /findButton/);
+    assert.match(helper, /await getHuntState\(\)/);
+    assert.match(helper, /nextPage === route/);
+    assert.match(helper, /activate\(nextState\)/);
     assert.doesNotMatch(helper, /resetHuntState|claimReward/);
 });
 

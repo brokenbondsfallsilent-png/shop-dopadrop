@@ -73,6 +73,9 @@ test('duplicate and stale request IDs submit only once', async () => {
             return new Promise(resolve => { release = resolve; });
         }
     });
+    app.emit({ type: 'RABBIT_QUESTION_READY' });
+    await tick();
+    app.posted.length = 0;
     const action = { type: 'RABBIT_QUESTION_ACTION', requestId: 'req-1', action: 'answer', choiceId: 'yes' };
 
     app.emit(action);
@@ -87,10 +90,37 @@ test('duplicate and stale request IDs submit only once', async () => {
     assert.equal(app.posted.filter(message => message.type === 'RABBIT_QUESTION_RESULT').length, 1);
 });
 
+test('a second distinct request cannot submit while the first is unresolved', async () => {
+    let release;
+    const app = harness({
+        submit: action => {
+            app.calls.submit.push(action);
+            return new Promise(resolve => { release = resolve; });
+        }
+    });
+    app.emit({ type: 'RABBIT_QUESTION_READY' });
+    await tick();
+    app.posted.length = 0;
+
+    app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-1', action: 'answer', choiceId: 'yes' });
+    app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-2', action: 'answer', choiceId: 'yes' });
+    await tick();
+    assert.equal(app.calls.submit.length, 1);
+
+    release({ ok: true });
+    await tick();
+    app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-3', action: 'answer', choiceId: 'yes' });
+    await tick();
+    assert.equal(app.calls.submit.length, 2);
+});
+
 test('backend errors render only the safe mapped snapshot', async () => {
     const app = harness({
         async submit() { throw new Error('provider-secret-stack'); }
     });
+    app.emit({ type: 'RABBIT_QUESTION_READY' });
+    await tick();
+    app.posted.length = 0;
     app.emit({ type: 'RABBIT_QUESTION_ACTION', requestId: 'req-9', action: 'answer', choiceId: 'yes' });
     await tick();
 
