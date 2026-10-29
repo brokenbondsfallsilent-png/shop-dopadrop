@@ -75,7 +75,7 @@
 - Test: `tests/rabbit-question-pages.test.cjs`
 
 **Interfaces:**
-- Consumes: existing authoritative `view.guardian.characterId` and Cave Tanglebright state.
+- Consumes: existing authoritative `view.guardian.id` and Cave Tanglebright state.
 - Produces: safe `guardianKey` values consumed by Task 2.
 
 - [ ] Add failing controller tests asserting Forest exposes only the current guardian key and Cave selects Tanglebright.
