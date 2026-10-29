@@ -11,12 +11,15 @@
     const IDENTIFIER = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
     const ENVIRONMENTS = Object.freeze({
         daily: 'assets/rabbit-hole/daily-environment-v2.png',
-        forest: 'assets/rabbit-hole/forest-environment-v2.png',
-        cave: 'assets/rabbit-hole/cave-environment-v2.png'
+        forest: 'assets/rabbit-hole/forest-night-v3.png',
+        cave: 'assets/rabbit-hole/cave-environment-v4.png'
+    });
+    const DAY_ENVIRONMENTS = Object.freeze({
+        forest: 'assets/rabbit-hole/forest-day-v3.png'
     });
     const GUARDIANS = Object.freeze({
         mothkeeper: ['assets/rabbit-hole/mothkeeper-v4.png', 'Mothkeeper, guardian of the Rabbit Hole'],
-        rootwhisper: ['assets/rabbit-hole/rootwhisper-v2.png', 'Rootwhisper, guardian of the Rabbit Hole'],
+        rootwhisper: ['assets/rabbit-hole/rootwhisper-v7.png', 'Rootwhisper, guardian of the Rabbit Hole'],
         grumblebark: ['assets/rabbit-hole/grumblebark-v2.png', 'Grumblebark, guardian of the Rabbit Hole'],
         tanglebright: ['assets/rabbit-hole/tanglebright-v2.png', 'Tanglebright, guardian of the Rabbit Hole']
     });
@@ -65,6 +68,8 @@
             status: { kind: statusKind, message: cleanText(snapshot.status?.message, 500) },
             artwork: {
                 environment: ENVIRONMENTS[snapshot.mode],
+                environmentDay: DAY_ENVIRONMENTS[snapshot.mode] || ENVIRONMENTS[snapshot.mode],
+                environmentNight: ENVIRONMENTS[snapshot.mode],
                 guardian: guardian ? guardian[0] : null,
                 guardianAlt: guardian ? guardian[1] : ''
             },

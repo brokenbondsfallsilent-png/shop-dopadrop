@@ -98,7 +98,8 @@ const render=view=>{
   text(metaEnd,view.meta[1]);
   bar.style.width=view.progress.percent+'%';
   progress.setAttribute('aria-valuenow',String(view.progress.percent));
-  environment.src=view.artwork.environment;
+  const hour=new Date().getHours();
+  environment.src=hour>=6&&hour<18?view.artwork.environmentDay:view.artwork.environmentNight;
   if(view.artwork.guardian){guardian.src=view.artwork.guardian;guardian.alt=view.artwork.guardianAlt;guardian.classList.add('visible');scene.classList.add('has-guardian')}
   else{guardian.removeAttribute('src');guardian.alt='';guardian.classList.remove('visible');scene.classList.remove('has-guardian')}
   choices.replaceChildren();

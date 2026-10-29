@@ -41,6 +41,8 @@ test('daily choices remain ordered while private fields are discarded', () => {
     assert.equal(view.answer, undefined);
     assert.deepEqual(view.artwork, {
         environment: 'assets/rabbit-hole/daily-environment-v2.png',
+        environmentDay: 'assets/rabbit-hole/daily-environment-v2.png',
+        environmentNight: 'assets/rabbit-hole/daily-environment-v2.png',
         guardian: null,
         guardianAlt: ''
     });
@@ -48,7 +50,9 @@ test('daily choices remain ordered while private fields are discarded', () => {
 
 test('artwork paths are selected only from fixed mode and guardian allowlists', () => {
     const forest = buildQuestionView({ ...daily, mode: 'forest', guardianKey: 'mothkeeper' });
-    assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-environment-v2.png');
+    assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-night-v3.png');
+    assert.equal(forest.artwork.environmentDay, 'assets/rabbit-hole/forest-day-v3.png');
+    assert.equal(forest.artwork.environmentNight, 'assets/rabbit-hole/forest-night-v3.png');
     assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper-v4.png');
     assert.equal(forest.artwork.guardianAlt, 'Mothkeeper, guardian of the Rabbit Hole');
     assert.equal(buildQuestionView({ ...daily, mode: 'forest', guardianKey: '../../bad' }).artwork.guardian, null);
