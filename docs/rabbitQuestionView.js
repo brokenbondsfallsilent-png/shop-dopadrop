@@ -10,18 +10,18 @@
     ]);
     const IDENTIFIER = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
     const ENVIRONMENTS = Object.freeze({
-        daily: 'assets/rabbit-hole/daily-tavern-v4.png',
-        forest: 'assets/rabbit-hole/forest-night-v3.png',
-        cave: 'assets/rabbit-hole/cave-environment-v4.png'
+        daily: 'assets/rabbit-hole/daily-tavern-v4.webp',
+        forest: 'assets/rabbit-hole/forest-night-v3.webp',
+        cave: 'assets/rabbit-hole/cave-environment-v4.webp'
     });
     const DAY_ENVIRONMENTS = Object.freeze({
-        forest: 'assets/rabbit-hole/forest-day-v3.png'
+        forest: 'assets/rabbit-hole/forest-day-v3.webp'
     });
     const GUARDIANS = Object.freeze({
-        mothkeeper: ['assets/rabbit-hole/mothkeeper.png', 'Mothkeeper, guardian of the Rabbit Hole'],
-        rootwhisper: ['assets/rabbit-hole/rootwhisper-v7.png', 'Rootwhisper, guardian of the Rabbit Hole'],
-        grumblebark: ['assets/rabbit-hole/grumblebark-v2.png', 'Grumblebark, guardian of the Rabbit Hole'],
-        tanglebright: ['assets/rabbit-hole/tanglebright-v4.png', 'Tanglebright, guardian of the Rabbit Hole']
+        mothkeeper: ['assets/rabbit-hole/mothkeeper.webp', 'Mothkeeper, guardian of the Rabbit Hole'],
+        rootwhisper: ['assets/rabbit-hole/rootwhisper-v7.webp', 'Rootwhisper, guardian of the Rabbit Hole'],
+        grumblebark: ['assets/rabbit-hole/grumblebark-v2.webp', 'Grumblebark, guardian of the Rabbit Hole'],
+        tanglebright: ['assets/rabbit-hole/tanglebright-v4.webp', 'Tanglebright, guardian of the Rabbit Hole']
     });
 
     function cleanText(value, maximum = 500) {

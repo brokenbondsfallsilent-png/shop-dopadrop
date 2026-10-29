@@ -40,9 +40,9 @@ test('daily choices remain ordered while private fields are discarded', () => {
     assert.equal(view.rewardChoice, undefined);
     assert.equal(view.answer, undefined);
     assert.deepEqual(view.artwork, {
-        environment: 'assets/rabbit-hole/daily-tavern-v4.png',
-        environmentDay: 'assets/rabbit-hole/daily-tavern-v4.png',
-        environmentNight: 'assets/rabbit-hole/daily-tavern-v4.png',
+        environment: 'assets/rabbit-hole/daily-tavern-v4.webp',
+        environmentDay: 'assets/rabbit-hole/daily-tavern-v4.webp',
+        environmentNight: 'assets/rabbit-hole/daily-tavern-v4.webp',
         guardian: null,
         guardianAlt: ''
     });
@@ -50,13 +50,13 @@ test('daily choices remain ordered while private fields are discarded', () => {
 
 test('artwork paths are selected only from fixed mode and guardian allowlists', () => {
     const forest = buildQuestionView({ ...daily, mode: 'forest', guardianKey: 'mothkeeper' });
-    assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-night-v3.png');
-    assert.equal(forest.artwork.environmentDay, 'assets/rabbit-hole/forest-day-v3.png');
-    assert.equal(forest.artwork.environmentNight, 'assets/rabbit-hole/forest-night-v3.png');
-    assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper.png');
+    assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-night-v3.webp');
+    assert.equal(forest.artwork.environmentDay, 'assets/rabbit-hole/forest-day-v3.webp');
+    assert.equal(forest.artwork.environmentNight, 'assets/rabbit-hole/forest-night-v3.webp');
+    assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper.webp');
     assert.equal(forest.artwork.guardianAlt, 'Mothkeeper, guardian of the Rabbit Hole');
     assert.equal(buildQuestionView({ ...daily, mode: 'forest', guardianKey: '../../bad' }).artwork.guardian, null);
-    assert.equal(buildQuestionView({ ...daily, mode: 'cave', guardianKey: 'tanglebright' }).artwork.guardian, 'assets/rabbit-hole/tanglebright-v4.png');
+    assert.equal(buildQuestionView({ ...daily, mode: 'cave', guardianKey: 'tanglebright' }).artwork.guardian, 'assets/rabbit-hole/tanglebright-v4.webp');
 });
 
 test('missing and malformed question snapshots fail closed', () => {

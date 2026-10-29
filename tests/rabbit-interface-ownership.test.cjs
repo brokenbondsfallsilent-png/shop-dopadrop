@@ -302,7 +302,7 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
 test('shared question assets preserve served parity and reward reset safeguards', () => {
     assert.equal(read('docs/rabbit-question.html'), read('src/public/rabbit-question.html'));
     assert.equal(read('docs/rabbitQuestionView.js'), read('src/public/rabbitQuestionView.js'));
-    for (const file of ['daily-tavern-v4.png', 'forest-day-v3.png', 'forest-night-v3.png', 'cave-environment-v4.png', 'mothkeeper.png', 'rootwhisper-v7.png', 'grumblebark-v2.png', 'tanglebright-v4.png']) {
+    for (const file of ['daily-tavern-v4.webp', 'forest-day-v3.webp', 'forest-night-v3.webp', 'cave-environment-v4.webp', 'mothkeeper.webp', 'rootwhisper-v7.webp', 'grumblebark-v2.webp', 'tanglebright-v4.webp']) {
         assert.deepEqual(
             fs.readFileSync(path.join(root, 'docs/assets/rabbit-hole', file)),
             fs.readFileSync(path.join(root, 'src/public/assets/rabbit-hole', file))
