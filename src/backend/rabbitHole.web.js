@@ -13,6 +13,7 @@ import { addFind, normaliseState, publicState } from './rabbitCore';
 import { rabbitActivityFacts } from './rabbitActivity';
 import { issueChallenge, verifyChallenge } from './rabbitChallenge';
 import { buildRabbitDashboard } from './rabbitDashboard';
+import { buildForestStageView } from './rabbitForestView';
 import { recordDailyResult } from './rabbitDailyGuard';
 import { beginCheckoutCodeClaim, beginRewardClaim, finalizeRewardClaim, markRewardClaimUncertain } from './rabbitReward';
 import { loadDopaProfile, memberProfileView, recordDopaActivity } from './dopaProfiles';
@@ -157,6 +158,11 @@ export const chooseLootgrem = webMethod(Permissions.SiteMember, async (node, opt
     return option === 'claim'
         ? { ...transition.response, rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED }
         : transition.response;
+});
+
+export const getForestContent = webMethod(Permissions.SiteMember, async () => {
+    const id = await memberId();
+    return buildForestStageView(await load(id));
 });
 
 export const forestEncounter = webMethod(Permissions.SiteMember, async (characterId, actionId) => {

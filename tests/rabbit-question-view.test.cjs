@@ -55,6 +55,20 @@ test('locked and completed states disable every choice', () => {
     }
 });
 
+test('only noninteractive locked and completed cards may omit choices', () => {
+    for (const kind of ['locked', 'completed']) {
+        const view = buildQuestionView({ ...daily, choices: [], status: { kind, message: 'Settled.' } });
+        assert.equal(view.valid, true);
+        assert.equal(view.disabled, true);
+        assert.deepEqual(view.choices, []);
+    }
+    assert.deepEqual(buildQuestionView({ ...daily, choices: [], status: { kind: 'ready', message: '' } }), {
+        valid: false,
+        disabled: true,
+        choices: []
+    });
+});
+
 test('long labels stay literal text instead of becoming markup', () => {
     const label = '<img src=x onerror=alert(1)> A very long answer that must wrap safely';
     const view = buildQuestionView({

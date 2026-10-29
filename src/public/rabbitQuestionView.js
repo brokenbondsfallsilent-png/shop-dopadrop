@@ -21,9 +21,11 @@
     function buildQuestionView(snapshot) {
         if (!snapshot || typeof snapshot !== 'object' || !MODES.includes(snapshot.mode)) return invalidView();
         const question = cleanText(snapshot.question, 1000);
-        if (!question || !Array.isArray(snapshot.choices) || snapshot.choices.length === 0) return invalidView();
+        const statusKind = STATUS_KINDS.includes(snapshot.status?.kind) ? snapshot.status.kind : 'ready';
+        const choicesMissing = !Array.isArray(snapshot.choices) || snapshot.choices.length === 0;
+        if (!question || (choicesMissing && !['locked', 'completed'].includes(statusKind))) return invalidView();
 
-        const choices = snapshot.choices.map(choice => {
+        const choices = (snapshot.choices || []).map(choice => {
             const id = cleanText(choice?.id, 64);
             const label = cleanText(choice?.label, 500);
             const action = cleanText(choice?.action, 32);
@@ -32,7 +34,6 @@
         });
         if (choices.some(choice => !choice)) return invalidView();
 
-        const statusKind = STATUS_KINDS.includes(snapshot.status?.kind) ? snapshot.status.kind : 'ready';
         const disabled = ['pending', 'locked', 'completed'].includes(statusKind);
         const current = Math.max(0, Math.floor(Number(snapshot.progress?.current) || 0));
         const total = Math.max(1, Math.floor(Number(snapshot.progress?.total) || 1));

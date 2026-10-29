@@ -31,3 +31,26 @@ test('Daily uses stable completion and safe attempt-limit feedback', () => {
     assert.match(source, /No points are awarded here/);
     assert.doesNotMatch(source, /entry\.answer|correctAnswer/);
 });
+
+test('Forest exposes one authenticated safe stage and no generated button IDs', () => {
+    const backend = read('src/backend/rabbitHole.web.js');
+    const source = read('src/pages/Rabbit Hole Forest.l4tqi.js');
+
+    assert.match(backend, /buildForestStageView/);
+    assert.match(backend, /export const getForestContent\s*=\s*webMethod\(Permissions\.SiteMember/);
+    assert.match(source, /getForestContent/);
+    assert.match(source, /bindRabbitQuestionView/);
+    assert.doesNotMatch(source, /comp-mvl0wln1|comp-mvl101pj|comp-mvl11a5p/);
+    assert.match(source, /choiceMap\.get\(action\.choiceId\)/);
+    assert.match(source, /forestEncounter\(choice\.characterId,\s*choice\.actionId\)/);
+});
+
+test('Forest refreshes the authoritative stage after success or stale action', () => {
+    const source = read('src/pages/Rabbit Hole Forest.l4tqi.js');
+
+    assert.match(source, /next:\s*await getForestContent\(\)/);
+    assert.match(source, /FOREST_PREDECESSOR_REQUIRED/);
+    assert.match(source, /FOREST_STAGE_LOCKED/);
+    assert.match(source, /result\.next/);
+    assert.match(source, /Grumblebark|guardian\.label/);
+});
