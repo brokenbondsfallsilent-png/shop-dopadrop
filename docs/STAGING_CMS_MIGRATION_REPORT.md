@@ -25,7 +25,7 @@ The live collections were missing the two `memberId` indexes declared by the loc
 | `DopaMemberProfiles` | `memberId` | `67b30553-b1b6-4c24-8edb-1a1e4d1c1420` | `memberId ASC` |
 | `RabbitHuntMembers` | `memberId` | `17ee82aa-852b-4e86-8d1d-bc09f86f657b` | `memberId ASC` |
 
-Wix accepted both index requests. The indexes must reach `ACTIVE` before the migration is considered fully settled.
+Wix accepted both index requests. A read-only status check confirmed both indexes reached `ACTIVE`, so the schema migration is fully settled.
 
 ## Rollback boundary
 
