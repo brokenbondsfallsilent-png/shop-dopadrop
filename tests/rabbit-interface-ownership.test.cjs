@@ -26,6 +26,14 @@ test('the shared header owns the single gemstone launcher', () => {
     assert.doesNotMatch(source, /rabbitWidget\.collapse\(\)/);
 });
 
+test('Wix embeds use the current hosted asset cache revision', () => {
+    const masterSource = read('src/pages/masterPage.js');
+    const homeSource = read('src/pages/Home.c1dmp.js');
+
+    assert.match(masterSource, /rabbit-widget\.html\?v=f956b0a/);
+    assert.match(homeSource, /shop-dopadrop\/\?v=f956b0a/);
+});
+
 test('the embedded Home header owns one account link and native member bars are removed', () => {
     const source = read('src/pages/masterPage.js');
     const home = read('src/public/shop-dopadrop-home-current.html');

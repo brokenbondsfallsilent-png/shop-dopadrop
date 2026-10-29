@@ -47,7 +47,7 @@ $w.onReady(function () {
 $w.onReady(function () {
     const rabbitWidget = $w('#html2');
     if (!rabbitWidget) return;
-    rabbitWidget.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/rabbit-widget.html?v=member-dashboard-1';
+    rabbitWidget.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/rabbit-widget.html?v=f956b0a';
     try {
         if (typeof rabbitWidget.expand === 'function') rabbitWidget.expand();
         if (typeof rabbitWidget.show === 'function') rabbitWidget.show();

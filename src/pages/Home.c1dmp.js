@@ -16,7 +16,7 @@ $w.onReady(function () {
     // Force Wix's HTML component to load the current bridge-enabled build.
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
-    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=4f24fe1';
+    view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=f956b0a';
     // The hunt is page-aware: the server rejects a discovery unless the
     // browser is on the assigned destination route.
     const currentHuntPage = () => {
