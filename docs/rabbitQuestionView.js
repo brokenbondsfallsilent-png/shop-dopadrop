@@ -18,10 +18,10 @@
         forest: 'assets/rabbit-hole/forest-day-v3.png'
     });
     const GUARDIANS = Object.freeze({
-        mothkeeper: ['assets/rabbit-hole/mothkeeper-v4.png', 'Mothkeeper, guardian of the Rabbit Hole'],
+        mothkeeper: ['assets/rabbit-hole/mothkeeper.png', 'Mothkeeper, guardian of the Rabbit Hole'],
         rootwhisper: ['assets/rabbit-hole/rootwhisper-v7.png', 'Rootwhisper, guardian of the Rabbit Hole'],
         grumblebark: ['assets/rabbit-hole/grumblebark-v2.png', 'Grumblebark, guardian of the Rabbit Hole'],
-        tanglebright: ['assets/rabbit-hole/tanglebright-v2.png', 'Tanglebright, guardian of the Rabbit Hole']
+        tanglebright: ['assets/rabbit-hole/tanglebright-v4.png', 'Tanglebright, guardian of the Rabbit Hole']
     });
 
     function cleanText(value, maximum = 500) {

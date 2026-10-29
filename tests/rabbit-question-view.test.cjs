@@ -53,10 +53,10 @@ test('artwork paths are selected only from fixed mode and guardian allowlists', 
     assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-night-v3.png');
     assert.equal(forest.artwork.environmentDay, 'assets/rabbit-hole/forest-day-v3.png');
     assert.equal(forest.artwork.environmentNight, 'assets/rabbit-hole/forest-night-v3.png');
-    assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper-v4.png');
+    assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper.png');
     assert.equal(forest.artwork.guardianAlt, 'Mothkeeper, guardian of the Rabbit Hole');
     assert.equal(buildQuestionView({ ...daily, mode: 'forest', guardianKey: '../../bad' }).artwork.guardian, null);
-    assert.equal(buildQuestionView({ ...daily, mode: 'cave', guardianKey: 'tanglebright' }).artwork.guardian, 'assets/rabbit-hole/tanglebright-v2.png');
+    assert.equal(buildQuestionView({ ...daily, mode: 'cave', guardianKey: 'tanglebright' }).artwork.guardian, 'assets/rabbit-hole/tanglebright-v4.png');
 });
 
 test('missing and malformed question snapshots fail closed', () => {
