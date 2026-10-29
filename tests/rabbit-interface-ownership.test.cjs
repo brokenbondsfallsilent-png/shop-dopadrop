@@ -72,7 +72,8 @@ test('the cave page cannot directly issue a live reward', () => {
     const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
 
     assert.doesNotMatch(source, /claimReward/);
-    assert.match(source, /chooseLootgrem\('reward', 'claim'\)/);
+    assert.match(source, /chooseLootgrem\(currentNode,\s*action\.choiceId\)/);
+    assert.match(source, /rewardIssuanceEnabled/);
 });
 
 test('the compact widget has one complete document and one small login control', () => {

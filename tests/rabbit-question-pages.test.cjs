@@ -54,3 +54,28 @@ test('Forest refreshes the authoritative stage after success or stale action', (
     assert.match(source, /result\.next/);
     assert.match(source, /Grumblebark|guardian\.label/);
 });
+
+test('Cave renders authoritative dialogue and removes generated button IDs', () => {
+    const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
+
+    assert.doesNotMatch(source, /comp-mvl0ugrl|comp-mvl0uqjc|comp-mvl0v0ka/);
+    assert.doesNotMatch(source, /claimReward/);
+    assert.match(source, /bindRabbitQuestionView/);
+    assert.match(source, /enterCave\(\)/);
+    assert.match(source, /result\.dialogue/);
+    assert.match(source, /dialogue\?\.choices[\s\S]*\.map/);
+    assert.match(source, /chooseLootgrem\(currentNode,\s*action\.choiceId\)/);
+});
+
+test('Cave maps next dialogue, terminal choices and locked access safely', () => {
+    const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
+
+    assert.match(source, /currentNode\s*=\s*result\.next/);
+    assert.match(source, /result\.dialogue/);
+    assert.match(source, /result\.next\s*===\s*'claim'/);
+    assert.match(source, /result\.next\s*===\s*'code'/);
+    assert.match(source, /rewardIssuanceEnabled/);
+    assert.match(source, /CAVE_LOCKED/);
+    assert.match(source, /kind:\s*'locked'/);
+    assert.match(source, /choices:\s*\[\]/);
+});
