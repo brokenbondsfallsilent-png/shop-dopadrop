@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rabbit Hole question</title>
+<style>
+:root{color-scheme:dark;--black:#09090d;--panel:#12121b;--white:#f4f4ef;--muted:#aaaab6;--cyan:#37e8ff;--pink:#ff37bb;--yellow:#f5ff37;--green:#a7ff42}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:transparent;font-family:Arial,sans-serif;color:var(--white)}
+body{padding:8px}
+.card{position:relative;overflow:hidden;width:min(100%,760px);margin:0 auto;padding:32px;background:linear-gradient(160deg,var(--panel),var(--black));border:1px solid #454552;border-radius:24px;box-shadow:0 18px 54px rgba(0,0,0,.34)}
+.card:before{content:"";position:absolute;z-index:0;width:220px;height:220px;right:-100px;top:-70px;border-radius:50%;background:var(--pink);filter:blur(110px);opacity:.14;pointer-events:none}
+.card>*{position:relative;z-index:1}
+.eyebrow{color:var(--cyan);font-size:12px;font-weight:900;line-height:1.3;letter-spacing:.15em;text-transform:uppercase}
+.progress{height:5px;margin:12px 0 24px;background:#282832;border-radius:99px;overflow:hidden}
+.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .2s ease}
+h1{margin:0 0 10px;color:var(--white);font-size:clamp(24px,4.8vw,36px);line-height:1.15}
+.hint{margin:0 0 22px;color:var(--muted);font-size:16px;line-height:1.5}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0;padding:0;border:0}
+.choice{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;padding:14px 16px;background:#171720;color:var(--white);border:1px solid #454552;border-radius:12px;font:800 16px/1.3 Arial,sans-serif;text-align:center;white-space:normal;overflow-wrap:anywhere;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background-color .16s ease}
+.choice:last-child:nth-child(odd){grid-column:1 / -1}
+.choice:hover:not(:disabled){transform:translateY(-2px);border-color:var(--cyan)}
+.choice:focus-visible{outline:3px solid #f5ff37;outline-offset:4px}
+.choice[aria-checked="true"]{border-color:var(--pink);background:#291520}
+.choice:disabled{cursor:not-allowed;opacity:.58}
+.status{min-height:24px;margin:18px 0 0;color:var(--muted);font-size:14px;line-height:1.4}
+.meta{display:flex;justify-content:space-between;gap:16px;margin-top:14px;color:#858592;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.state-ready .status{color:var(--muted)}
+.state-pending .status{color:var(--cyan)}
+.state-correct .status,.state-completed .status{color:var(--green)}
+.state-incorrect .status,.state-error .status{color:var(--pink)}
+.state-locked .status,.state-limited .status{color:var(--yellow)}
+@media (max-width:600px){
+  body{padding:0}
+  .card{padding:20px 18px;border-radius:20px}
+  .choices{grid-template-columns:1fr;gap:10px}
+  .choice{justify-content:flex-start;min-height:48px;text-align:left;border-left:4px solid var(--cyan)}
+  .choice:nth-child(2n){border-left-color:var(--pink)}
+  .choice:nth-child(3n){border-left-color:var(--yellow)}
+  .choice:last-child:nth-child(odd){grid-column:auto}
+}
+@media (prefers-reduced-motion:reduce){.choice,.progress span{transition:none}}
+</style>
+</head>
+<body>
+<main class="card state-ready" id="card" data-state="ready">
+  <div class="eyebrow" id="eyebrow"></div>
+  <div class="progress" role="progressbar" aria-label="Question progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="bar"></span></div>
+  <h1 id="question">Loading the forest…</h1>
+  <p class="hint" id="hint"></p>
+  <div class="choices" id="choices" role="radiogroup" aria-labelledby="question"></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="meta"><span id="metaStart"></span><span id="metaEnd"></span></div>
+</main>
+<script src="rabbitQuestionView.js"></script>
+<script>
+const card=document.getElementById('card');
+const eyebrow=document.getElementById('eyebrow');
+const bar=document.getElementById('bar');
+const progress=bar.parentElement;
+const question=document.getElementById('question');
+const hint=document.getElementById('hint');
+const choices=document.getElementById('choices');
+const statusNode=document.getElementById('status');
+const metaStart=document.getElementById('metaStart');
+const metaEnd=document.getElementById('metaEnd');
+const stateClasses=['state-ready','state-pending','state-correct','state-incorrect','state-locked','state-completed','state-error','state-limited'];
+let pending=false;
+let currentRequestId='';
+const text=(node,value)=>{node.textContent=String(value||'')};
+const setState=kind=>{stateClasses.forEach(name=>card.classList.remove(name));card.classList.add('state-'+kind);card.dataset.state=kind};
+const render=view=>{
+  pending=view.status.kind==='pending';
+  setState(view.status.kind);
+  text(eyebrow,view.eyebrow);
+  text(question,view.question);
+  text(hint,view.hint);
+  text(statusNode,view.status.message);
+  text(metaStart,view.meta[0]);
+  text(metaEnd,view.meta[1]);
+  bar.style.width=view.progress.percent+'%';
+  progress.setAttribute('aria-valuenow',String(view.progress.percent));
+  choices.replaceChildren();
+  view.choices.forEach(item=>{
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='choice';
+    button.setAttribute('role','radio');
+    button.setAttribute('aria-checked','false');
+    button.disabled=view.disabled||item.disabled;
+    text(button,item.label);
+    button.addEventListener('click',()=>{
+      if(pending)return;
+      pending=true;
+      currentRequestId='q-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+      setState('pending');
+      text(statusNode,'The forest is listening…');
+      [...choices.children].forEach(control=>{control.disabled=true;control.setAttribute('aria-checked',String(control===button))});
+      parent.postMessage({type:'RABBIT_QUESTION_ACTION',requestId:currentRequestId,action:item.action,choiceId:item.id},'*');
+    });
+    choices.appendChild(button);
+  });
+};
+window.addEventListener('message',event=>{
+  if(event.source!==parent)return;
+  const data=event.data||{};
+  if(data.type==='RABBIT_QUESTION_RENDER'){
+    const message=RabbitQuestionView.normaliseRenderMessage(data);
+    if(message){currentRequestId=message.requestId;render(message.payload)}
+    return;
+  }
+  if(data.type==='RABBIT_QUESTION_RESULT'&&data.requestId===currentRequestId){
+    const view=RabbitQuestionView.buildQuestionView(data.payload);
+    if(view.valid)render(view);
+  }
+});
+parent.postMessage({type:'RABBIT_QUESTION_READY'},'*');
+</script>
+</body>
+</html>
+

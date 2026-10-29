@@ -265,3 +265,29 @@ test('the standalone homepage mounts the gem while the Wix hunt iframe leaves it
     }
 });
 
+test('the shared Rabbit question renderer owns one safe responsive choice surface', () => {
+    const source = read('src/public/rabbit-question.html');
+    const servedSource = read('docs/rabbit-question.html');
+
+    assert.equal(servedSource, source);
+    assert.equal((source.match(/<!doctype html>/gi) || []).length, 1);
+    assert.equal((source.match(/<\/html>/gi) || []).length, 1);
+    assert.equal((source.match(/role="radiogroup"/g) || []).length, 1);
+    assert.doesNotMatch(source, /innerHTML\s*=/);
+    assert.match(source, /event\.source\s*!==\s*parent/);
+    assert.match(source, /grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
+    assert.match(source, /\.choice:last-child:nth-child\(odd\)\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/s);
+    assert.match(source, /min-height:\s*48px/);
+    assert.match(source, /:focus-visible\s*\{[^}]*outline:\s*3px solid #f5ff37/s);
+    assert.match(source, /@media\s*\(max-width:\s*600px\)/);
+    assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*grid-template-columns:\s*1fr/);
+    assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*border-left:\s*4px solid/);
+
+    for (const state of ['ready', 'pending', 'correct', 'incorrect', 'locked', 'completed', 'error', 'limited']) {
+        assert.match(source, new RegExp(`data-state="${state}"|state-${state}`));
+    }
+
+    assert.match(source, /if\s*\(pending\)\s*return/);
+    assert.doesNotMatch(source, /claimReward|resetHuntState|memberId|rewardChoice/);
+});
+
