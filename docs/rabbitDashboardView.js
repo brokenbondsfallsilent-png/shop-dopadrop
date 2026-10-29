@@ -2,7 +2,7 @@
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
     if (root) root.RabbitDashboardView = api;
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+}(typeof window !== 'undefined' ? window : this, function () {
     const SAFE_REWARD_STATUSES = new Set([
         'not_eligible', 'eligible', 'pending', 'reconciliation_required', 'awarded', 'code_issued'
     ]);
