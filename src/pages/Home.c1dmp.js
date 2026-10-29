@@ -44,10 +44,22 @@ $w.onReady(function () {
         '/category/visual-light-stimulation', '/category/auditory-rhythm-tools',
         '/category/focus-calm-tools', '/category/stim-toys-squishies',
         '/category/sensory-kits-bundles', '/category/movement-balance',
-        '/category/all-products', '/category/best-sellers', '/gift-card',
+        '/category/all-products', '/category/best-sellers', '/category/puzzles-hands-on-play', '/gift-card', '/search',
         '/about', '/contact', '/blog', '/cart-page', '/profile/my/profile', '/shipping-policy', '/refund-policy',
         '/privacy-policy', '/terms-and-conditions', '/accessibility-statement'
     ]);
+    // These are the exact fallback cards embedded in the saved homepage.
+    // Keep their links usable before, or if, the catalogue request completes.
+    [
+        "/product-page/sdd-005-keyboard-fidget-toy-005",
+        "/product-page/sdd-001-deformable-fidget-robot-001",
+        "/product-page/shop-dopadrop-sdd-061",
+        "/product-page/sdd-004-kalimba-thumb-piano-17-tone-kalimba-beginner-004",
+        "/product-page/shop-dopadrop-sdd-136",
+        "/product-page/sdd-003-high-grade-six-face-picture-wooden-jigsaw-3d-puzzle-toys-children-s-003",
+        "/product-page/sdd-021-shining-led-fidget-spinner-021",
+        "/product-page/shop-dopadrop-sdd-208"
+    ].forEach(path => allowedPaths.add(path));
     function mediaUrl(value) {
         if (!value) return '';
         if (value.startsWith('https://')) return value;
