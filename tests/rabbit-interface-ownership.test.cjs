@@ -128,3 +128,18 @@ test('the single gem requests and renders the allowlisted member dashboard', () 
     assert.doesNotMatch(widget, /innerHTML\s*=/);
 });
 
+test('the gem clears prior member data when the dashboard becomes signed out', () => {
+    const widget = read('src/public/rabbit-widget.html');
+    const servedWidget = read('docs/rabbit-widget.html');
+
+    assert.equal(servedWidget, widget);
+    assert.match(widget, /const clearDashboard=/);
+    assert.match(widget, /if\(!view\.signedIn\)\{clearDashboard\(\);/);
+    assert.match(widget, /text\(xp,'0 XP'\)/);
+    assert.match(widget, /text\(count,'0 \/ 50'\)/);
+    assert.match(widget, /text\(forest,'0 encounters'\)/);
+    assert.match(widget, /text\(daily,'0 \/ 0'\)/);
+    assert.match(widget, /text\(reward,'Treasure locked'\)/);
+    assert.match(widget, /bar\.style\.width='0%'/);
+});
+
