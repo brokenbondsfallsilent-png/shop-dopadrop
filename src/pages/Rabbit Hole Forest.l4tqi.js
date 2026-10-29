@@ -37,6 +37,7 @@ $w.onReady(async () => {
         const guardianNumber = Math.min(view.progress.current + 1, view.progress.total);
         return {
             mode: 'forest',
+            guardianKey: view.guardian?.characterId || '',
             eyebrow: view.guardian ? `Guardian ${guardianNumber} · ${view.guardian.label}` : 'Forest guardians',
             progress: view.progress,
             question: view.prompt,

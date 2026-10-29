@@ -283,6 +283,11 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
     assert.match(source, /@media\s*\(max-width:\s*600px\)/);
     assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*grid-template-columns:\s*1fr/);
     assert.match(source, /@media\s*\(max-width:\s*600px\)[\s\S]*border-left:\s*4px solid/);
+    assert.match(source, /id="environment"/);
+    assert.match(source, /id="guardian"/);
+    assert.match(source, /view\.artwork\.environment/);
+    assert.match(source, /view\.artwork\.guardian/);
+    assert.match(source, /prefers-reduced-motion/);
 
     for (const state of ['ready', 'pending', 'correct', 'incorrect', 'locked', 'completed', 'error', 'limited']) {
         assert.match(source, new RegExp(`data-state="${state}"|state-${state}`));
@@ -295,6 +300,12 @@ test('the shared Rabbit question renderer owns one safe responsive choice surfac
 test('shared question assets preserve served parity and reward reset safeguards', () => {
     assert.equal(read('docs/rabbit-question.html'), read('src/public/rabbit-question.html'));
     assert.equal(read('docs/rabbitQuestionView.js'), read('src/public/rabbitQuestionView.js'));
+    for (const file of ['daily-environment.png', 'forest-environment.png', 'cave-environment.png', 'mothkeeper.png', 'rootwhisper.png', 'grumblebark.png', 'tanglebright.png']) {
+        assert.deepEqual(
+            fs.readFileSync(path.join(root, 'docs/assets/rabbit-hole', file)),
+            fs.readFileSync(path.join(root, 'src/public/assets/rabbit-hole', file))
+        );
+    }
 
     const backend = read('src/backend/rabbitHole.web.js');
     const pages = [

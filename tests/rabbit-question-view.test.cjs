@@ -39,6 +39,20 @@ test('daily choices remain ordered while private fields are discarded', () => {
     assert.equal(view.memberId, undefined);
     assert.equal(view.rewardChoice, undefined);
     assert.equal(view.answer, undefined);
+    assert.deepEqual(view.artwork, {
+        environment: 'assets/rabbit-hole/daily-environment.png',
+        guardian: null,
+        guardianAlt: ''
+    });
+});
+
+test('artwork paths are selected only from fixed mode and guardian allowlists', () => {
+    const forest = buildQuestionView({ ...daily, mode: 'forest', guardianKey: 'mothkeeper' });
+    assert.equal(forest.artwork.environment, 'assets/rabbit-hole/forest-environment.png');
+    assert.equal(forest.artwork.guardian, 'assets/rabbit-hole/mothkeeper.png');
+    assert.equal(forest.artwork.guardianAlt, 'Mothkeeper, guardian of the Rabbit Hole');
+    assert.equal(buildQuestionView({ ...daily, mode: 'forest', guardianKey: '../../bad' }).artwork.guardian, null);
+    assert.equal(buildQuestionView({ ...daily, mode: 'cave', guardianKey: 'tanglebright' }).artwork.guardian, 'assets/rabbit-hole/tanglebright.png');
 });
 
 test('missing and malformed question snapshots fail closed', () => {
