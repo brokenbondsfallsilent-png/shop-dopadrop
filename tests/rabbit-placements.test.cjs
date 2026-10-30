@@ -80,7 +80,7 @@ test('guardian milestones are Mothkeeper 20, Rootwhisper 30, Grumblebark 40 and 
     ]);
 });
 
-test('native route templates bind the reusable authenticated discovery control', () => {
+test('native route templates bind placement-aware authenticated discovery controls', () => {
     const bindings = [
         'src/pages/Category Page.jqjf7.js', 'src/pages/About.h2wml.js',
         'src/pages/Contact.sdtlj.js', 'src/pages/Shipping policy.rrbon.js',
@@ -96,12 +96,13 @@ test('native route templates bind the reusable authenticated discovery control',
             `${controller} does not bind the discovery control`);
     }
     const helper = read('src/public/rabbitDiscovery.js');
-    assert.match(helper, /#rabbitDiscoveryButton/);
-    assert.match(helper, /authentication\.promptLogin/);
+    assert.match(helper, /placementsForRoute/);
+    assert.doesNotMatch(helper, /#rabbitDiscoveryButton/);
+    assert.doesNotMatch(helper, /authentication\.promptLogin/);
     assert.match(helper, /beginButtonChallenge/);
     assert.match(helper, /findButton/);
     assert.match(helper, /await getHuntState\(\)/);
-    assert.match(helper, /nextPage === route/);
+    assert.match(helper, /nextPage !== route/);
     assert.match(helper, /activate\(nextState\)/);
     assert.match(helper, /options\.onFound\(result, nextState\)/);
     assert.doesNotMatch(helper, /resetHuntState|claimReward/);
