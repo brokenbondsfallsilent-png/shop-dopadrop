@@ -116,9 +116,14 @@ test('native route templates bind placement-aware authenticated discovery contro
 test('the homepage embed owns only discoveries one through four', () => {
     const home = read('src/public/shop-dopadrop-home-current.html');
     const served = read('docs/index.html');
-    assert.match(home, /slice\(0,4\)/);
-    assert.match(served, /slice\(0,4\)/);
-    assert.doesNotMatch(home, /slice\(0,50\)/);
+    for (const html of [home, served]) {
+        assert.match(html, /querySelectorAll\('\[data-rabbit-id\]'\)/);
+        assert.deepEqual(
+            [...html.matchAll(/data-rabbit-id="(\d+)"/g)].map(match => Number(match[1])),
+            [1, 4, 2, 3]
+        );
+        assert.doesNotMatch(html, /data-rabbit-id="(?:[5-9]|[1-9]\d+)"/);
+    }
 });
 
 test('the first homepage discovery opens the Wix member signup gate', () => {

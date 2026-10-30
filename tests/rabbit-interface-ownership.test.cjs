@@ -251,6 +251,27 @@ test('homepage discovery bands stay above decorative and text layers without lea
     }
 });
 
+test('homepage discoveries occupy four explicit canonical section bands', () => {
+    for (const relativePath of ['src/public/shop-dopadrop-home-current.html', 'docs/index.html']) {
+        const html = read(relativePath);
+        const expectedSections = [
+            ['top', 1],
+            ['products', 2],
+            ['collections', 3],
+            ['about', 4]
+        ];
+        for (const [sectionId, rabbitId] of expectedSections) {
+            const section = html.match(new RegExp(`<section[^>]*id="${sectionId}"[\\s\\S]*?<\\/section>`))?.[0] || '';
+            assert.match(section, new RegExp(`data-rabbit-id="${rabbitId}"`), `${relativePath} is missing discovery ${rabbitId} in ${sectionId}`);
+        }
+        for (let rabbitId = 1; rabbitId <= 4; rabbitId += 1) {
+            assert.equal((html.match(new RegExp(`data-rabbit-id="${rabbitId}"`, 'g')) || []).length, 1);
+        }
+        assert.match(html, /querySelectorAll\('\[data-rabbit-id\]'\)/);
+        assert.doesNotMatch(html, /querySelectorAll\('\.art-sprinkles \.float-piece'\)\]\.slice\(0,4\)/);
+    }
+});
+
 test('storefront route buttons have real destinations outside the Wix iframe', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
     const servedSource = read('docs/index.html');
