@@ -231,6 +231,16 @@ test('source and served mobile decoration bands clip transformed artwork', () =>
     assert.match(servedSource, /\.art-sprinkles\{[^}]*overflow:hidden/);
 });
 
+test('homepage discoveries remain reliable 44px touch targets on mobile', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /\.rabbit-secret\{[^}]*touch-action:manipulation/);
+        assert.match(html, /@media\(max-width:600px\)\{\.rabbit-secret\{[^}]*min-width:44px[^}]*min-height:44px/);
+    }
+});
+
 test('storefront route buttons have real destinations outside the Wix iframe', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
     const servedSource = read('docs/index.html');
