@@ -241,6 +241,16 @@ test('homepage discoveries remain reliable 44px touch targets on mobile', () => 
     }
 });
 
+test('homepage discovery bands stay above decorative and text layers without leaving their bands', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /\.art-sprinkles\{[^}]*overflow:hidden[^}]*isolation:isolate[^}]*z-index:2/);
+        assert.match(html, /\.rabbit-secret\{[^}]*z-index:3/);
+    }
+});
+
 test('storefront route buttons have real destinations outside the Wix iframe', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
     const servedSource = read('docs/index.html');
