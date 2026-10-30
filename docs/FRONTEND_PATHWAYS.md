@@ -9,7 +9,7 @@ This is the implementation map for storefront navigation, visible controls and t
 | Homepage embed | `#html3` and `shop-dopadrop-home-current.html` | Homepage visuals, catalogue cards, collection cards and hidden discoveries 1–4 |
 | Shared Rabbit Hole launcher | `#html2` and `rabbit-widget.html` | The single visible gem, progress summary and links to Cave, Forest and Daily |
 | Shared Rabbit Hole questions | `#rabbitQuestionView`, `rabbit-question.html` and `rabbitQuestionBridge.js` | B1 Neon Tiles rendering for Daily, all four Forest guardians and Cave dialogue; page controllers retain authentication and backend authority |
-| Wix native pages | `rabbitDiscovery.js` and page controllers | Authenticated discoveries 5–50 on audited collection, content, policy, member and adventure routes |
+| Wix native pages | `rabbitDiscovery.js`, `rabbitPlacementSlots.js` and page controllers | Authenticated discoveries 5–50 on audited collection, content, policy and adventure routes |
 
 The homepage's internal Rabbit Hole HUD stays hidden. The shared header is the only visible launcher.
 
@@ -52,9 +52,11 @@ Successful daily riddles and forest encounters also synchronize trusted private 
 - The public widget has no progress-reset control.
 - No member-callable backend progress-reset method is exposed.
 - The Cave page cannot directly issue a live reward.
-- The canonical placement registry contains exactly 50 ordered IDs. IDs 1–4 stay in the homepage embed; IDs 5–50 use a reusable native `#rabbitDiscoveryButton` contract on the owning Wix page or template.
+- The canonical placement registry contains exactly 50 ordered IDs. IDs 1–4 stay in explicit homepage artwork bands. IDs 5–50 use page-local native controls: numbered IDs on static pages and distinct heading, grid and footer slots on the Category template.
+- Discoveries 41–44 are redistributed to `/shipping-policy`, `/refund-policy`, `/privacy-policy` and `/accessibility-statement`; no hunt placement depends on a locked member page.
+- Native controls belong in the normal page-canvas flow with a minimum 44 by 44 CSS-pixel mobile target. They sit above ordinary page content while Wix system overlays such as navigation, login, cart, cookies, lightboxes and accessibility dialogs remain above them.
 - Guardian encounters unlock at unique discovery counts 20 Mothkeeper, 30 Rootwhisper, 40 Grumblebark and 50 Tanglebright.
-- Native editor placement remains a Wix Studio task; missing elements fail safely and are listed in `HIDDEN_BUTTON_PLACEMENTS.md`.
+- Local wiring, Editor placement, Preview verification and Production verification are separate evidence states. Missing native elements fail safely and every required slot is listed in `HIDDEN_BUTTON_PLACEMENTS.md`.
 
 ## Backend challenge verification
 

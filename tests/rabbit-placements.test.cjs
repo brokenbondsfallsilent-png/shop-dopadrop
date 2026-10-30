@@ -131,6 +131,23 @@ test('the first homepage discovery opens the Wix member signup gate', () => {
     assert.match(home, /memberReady!==true\)\{send\(\{type:'RABBIT_LOGIN_REQUEST'\}\)/);
 });
 
+test('placement documentation describes the page-local foreground contract', () => {
+    const placements = read('docs/HIDDEN_BUTTON_PLACEMENTS.md');
+    const pathways = read('docs/FRONTEND_PATHWAYS.md');
+    const combined = `${placements}\n${pathways}`;
+
+    assert.doesNotMatch(combined, /reusable native `#rabbitDiscoveryButton`|require a native Wix Studio button with ID `#rabbitDiscoveryButton`/);
+    for (const slot of ['rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter']) {
+        assert.match(combined, new RegExp(slot));
+    }
+    for (const fragment of [
+        '41 | `/shipping-policy`', '42 | `/refund-policy`',
+        '43 | `/privacy-policy`', '44 | `/accessibility-statement`',
+        '44 by 44', 'normal page-canvas', 'Wix system overlays',
+        'Locally wired', 'Editor placed', 'Preview verified', 'Production verified'
+    ]) assert.match(combined, new RegExp(fragment));
+});
+
 test('reward issuance stays disabled and no public reset method is introduced', () => {
     const backend = read('src/backend/rabbitHole.web.js');
     assert.match(backend, /const REWARD_ISSUANCE_ENABLED = false/);
