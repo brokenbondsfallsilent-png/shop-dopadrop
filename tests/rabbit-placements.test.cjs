@@ -27,19 +27,48 @@ test('all fifty discoveries have one ordered placement on audited real routes', 
     }
 });
 
-test('placement distribution uses real storefront, support, policy, member and adventure routes', () => {
+test('placement distribution uses editable storefront, support, policy and adventure routes', () => {
     const routes = new Set(HUNT_PLACEMENTS.map(placement => placement.route));
     for (const route of [
         '/', '/category/all-products', '/category/desk-workspace-fidgets',
         '/category/movement-balance', '/about', '/contact', '/shipping-policy',
-        '/refund-policy', '/privacy-policy', '/profile/my/profile', '/my-orders',
-        '/account-settings', '/notifications', '/rabbit-hole-forest',
+        '/refund-policy', '/privacy-policy', '/rabbit-hole-forest',
         '/rabbit-hole-daily', '/blog', '/gift-card', '/accessibility-statement'
     ]) assert.ok(routes.has(route), `${route} has no discovery placement`);
+    for (const removedRoute of ['/profile/my/profile', '/my-orders', '/account-settings', '/notifications']) {
+        assert.equal(routes.has(removedRoute), false, `${removedRoute} must not own a discovery placement`);
+    }
     assert.equal(HUNT_PLACEMENTS.filter(item => item.route === '/').length, 4);
     assert.equal(HUNT_PLACEMENTS.filter(item => item.route === '/category/all-products').length, 3);
     assert.equal(HUNT_PLACEMENTS.filter(item => item.surface === 'collection').length, 24);
-    assert.equal(HUNT_PLACEMENTS.filter(item => item.surface === 'member').length, 4);
+    assert.equal(HUNT_PLACEMENTS.filter(item => item.surface === 'member').length, 0);
+});
+
+test('redistributed discoveries 41 through 44 use distinct editable policy anchors', () => {
+    const expected = [
+        [41, '/shipping-policy', 'delivery help footer', 'rabbitDiscovery41'],
+        [42, '/refund-policy', 'returns help footer', 'rabbitDiscovery42'],
+        [43, '/privacy-policy', 'data controls footer', 'rabbitDiscovery43'],
+        [44, '/accessibility-statement', 'assistance footer', 'rabbitDiscovery44']
+    ];
+    assert.deepEqual(
+        HUNT_PLACEMENTS.slice(40, 44).map(({ buttonId, route, anchor, editorElementId }) =>
+            [buttonId, route, anchor, editorElementId]),
+        expected
+    );
+});
+
+test('native placements resolve distinct page-local editor slots', () => {
+    const categoryIds = new Set(['rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter']);
+    for (const placement of HUNT_PLACEMENTS.slice(4)) {
+        if (placement.route.startsWith('/category/')) {
+            assert.ok(categoryIds.has(placement.editorElementId), `${placement.buttonId} has an invalid category slot`);
+        } else {
+            assert.equal(placement.editorElementId, `rabbitDiscovery${placement.buttonId}`);
+        }
+    }
+    const physicalKeys = HUNT_PLACEMENTS.slice(4).map(item => `${item.route}:${item.editorElementId}`);
+    assert.equal(new Set(physicalKeys).size, physicalKeys.length, 'a rendered route reuses a physical discovery slot');
 });
 
 test('guardian milestones are Mothkeeper 20, Rootwhisper 30, Grumblebark 40 and Tanglebright 50', () => {
