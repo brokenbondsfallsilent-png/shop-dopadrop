@@ -68,7 +68,7 @@ export const LOOTGREM_DIALOGUE = {
         ]
     },
     who: {
-        text: '“I am Tanglebright, the Loot Seeker. I keep the final choice: five hundred loyalty points, or the checkout code LOOTGREM.”',
+        text: '“I am Tanglebright, the Loot Seeker. I keep the final choice: five hundred loyalty points, or a checkout reward.”',
         choices: [{ id: 'reward', text: 'And my treasure?' }]
     },
     reward: {

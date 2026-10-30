@@ -141,10 +141,16 @@ export const enterCave = webMethod(Permissions.SiteMember, async () => {
     const id = await memberId();
     const state = await load(id);
     if (state.foundCount !== TOTAL_BUTTONS) throw new Error('CAVE_LOCKED');
-    state.caveEntered = true;
-    state.lootgremState = { node: 'welcome', claimAuthorized: false };
-    await save(state);
-    return { character: 'LOOTGREM', scene: 'forest_cave_campfire', dialogue: LOOTGREM_DIALOGUE.welcome, ...publicState(state) };
+    // Reloading the cave must not reset a saved dialogue or reward choice.
+    if (!state.caveEntered) {
+        state.caveEntered = true;
+        await save(state);
+    }
+    return {
+        character: 'LOOTGREM', scene: 'forest_cave_campfire',
+        dialogue: LOOTGREM_DIALOGUE[state.lootgremState.node],
+        ...publicState(state), rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED
+    };
 });
 
 export const chooseLootgrem = webMethod(Permissions.SiteMember, async (node, option) => {
@@ -155,9 +161,7 @@ export const chooseLootgrem = webMethod(Permissions.SiteMember, async (node, opt
     state.lootgremState = transition.state;
     if (transition.rewardChoice) state.rewardChoice = transition.rewardChoice;
     await save(state);
-    return option === 'claim'
-        ? { ...transition.response, rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED }
-        : transition.response;
+    return { ...transition.response, ...publicState(state), rewardIssuanceEnabled: REWARD_ISSUANCE_ENABLED };
 });
 
 export const getForestContent = webMethod(Permissions.SiteMember, async () => {
@@ -303,6 +307,10 @@ export const claimCheckoutCode = webMethod(Permissions.SiteMember, async () => {
     const id = await memberId();
     const state = await load(id);
     const prepared = beginCheckoutCodeClaim(state, { now: new Date() });
+    // Checkout rewards share the same fail-closed safety gate as loyalty points.
+    if (!REWARD_ISSUANCE_ENABLED) {
+        return { status: 'disabled', points: 0, message: 'Checkout reward issuance is disabled until integration testing is approved.' };
+    }
     if (prepared.action === 'issue_code') await save(prepared.state);
     return {
         status: 'code_issued',

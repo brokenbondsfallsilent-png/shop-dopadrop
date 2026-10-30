@@ -71,9 +71,10 @@ test('all header Rabbit Hole destinations have page controllers', () => {
 test('the cave page cannot directly issue a live reward', () => {
     const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
 
-    assert.doesNotMatch(source, /claimReward/);
+    assert.doesNotMatch(source, /accounts\.earnPoints|elevate\(/);
+    assert.match(read('src/backend/rabbitHole.web.js'), /const REWARD_ISSUANCE_ENABLED = false/);
     assert.match(source, /chooseLootgrem\(currentNode,\s*action\.choiceId\)/);
-    assert.match(source, /rewardIssuanceEnabled/);
+    assert.match(source, /result\.claim\.status === 'disabled'/);
 });
 
 test('the compact widget has one complete document and one small login control', () => {
@@ -317,6 +318,6 @@ test('shared question assets preserve served parity and reward reset safeguards'
     ].join('\n');
     assert.match(backend, /const REWARD_ISSUANCE_ENABLED = false/);
     assert.doesNotMatch(backend, /export const resetHuntState/);
-    assert.doesNotMatch(pages, /claimReward|resetHuntState/);
+    assert.doesNotMatch(pages, /accounts\.earnPoints|resetHuntState/);
 });
 

@@ -17,6 +17,8 @@ $w.onReady(function () {
     // The cache key is intentionally bumped whenever the embedded navigation
     // contract changes so an older filesusr snapshot cannot mask the router.
     view.src = 'https://brokenbondsfallsilent-png.github.io/shop-dopadrop/?v=rabbit50-20261029';
+    // Login through the shared gem must also refresh the homepage hunt gate.
+    authentication.onLogin(() => view.postMessage({ type: 'RABBIT_LOGIN_RESULT', ok: true }));
     // The hunt is page-aware: the server rejects a discovery unless the
     // browser is on the assigned destination route.
     const currentHuntPage = () => {

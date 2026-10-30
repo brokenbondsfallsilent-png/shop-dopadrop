@@ -25,24 +25,12 @@ export async function bindRabbitDiscovery($w, options = {}) {
         return { bound: false, reason: 'EDITOR_ELEMENT_MISSING' };
     }
     button.collapse();
-    let state;
-    try {
-        state = await getHuntState();
-    } catch (error) {
-        if (String(error?.message || error).includes('MEMBER_LOGIN_REQUIRED')) {
-            button.label = 'Sign in to begin the hidden hunt';
-            button.expand();
-            button.onClick(() => authentication.promptLogin());
-            return { bound: true, signInGate: true };
-        }
-        console.error('Rabbit discovery state failed:', error);
-        return { bound: false, reason: 'STATE_UNAVAILABLE' };
-    }
     const route = currentRoute();
     let buttonId;
     let challenge = null;
     const activate = nextState => {
         if (!nextState?.nextButtonId || nextState.nextPage !== route) {
+            buttonId = null;
             button.collapse();
             return false;
         }
@@ -53,13 +41,30 @@ export async function bindRabbitDiscovery($w, options = {}) {
         button.expand();
         return true;
     };
-    if (!activate(state)) return { bound: false, reason: 'NOT_ASSIGNED_HERE' };
-    button.onClick(async () => {
+    const refresh = async () => {
+        challenge = null;
         if (!(await authentication.loggedIn())) {
-            await authentication.promptLogin();
+            buttonId = null;
+            button.label = 'Sign in to begin the hidden hunt';
+            button.expand();
             return;
         }
+        activate(await getHuntState());
+    };
+    let inFlight = false;
+    button.onClick(async () => {
+        if (inFlight) return;
+        inFlight = true;
         try {
+            if (!(await authentication.loggedIn())) {
+                await authentication.promptLogin();
+                await refresh();
+                return;
+            }
+            if (!buttonId) {
+                await refresh();
+                return;
+            }
             if (!challenge) {
                 challenge = await beginButtonChallenge(buttonId, route);
                 setStatus($w, 'The mark stirred. Touch it once more.');
@@ -76,8 +81,26 @@ export async function bindRabbitDiscovery($w, options = {}) {
             else button.collapse();
         } catch (error) {
             challenge = null;
+            // The find may already be saved even if its reply/refresh failed.
+            // Re-read authoritative state before attempting any further challenge.
+            buttonId = null;
+            button.label = 'Retry loading the hidden hunt';
+            button.expand();
             setStatus($w, String(error?.message || error));
+        } finally {
+            inFlight = false;
         }
     });
+    if (typeof authentication.onLogin === 'function') authentication.onLogin(() => {
+        if (!inFlight) refresh().catch(() => setStatus($w, 'Reload the page to refresh your saved hunt.'));
+    });
+    try {
+        await refresh();
+    } catch (error) {
+        buttonId = null;
+        button.label = 'Retry loading the hidden hunt';
+        button.expand();
+        setStatus($w, 'Hunt state unavailable. Your saved progress has not been changed.');
+    }
     return { bound: true, buttonId, route };
 }
