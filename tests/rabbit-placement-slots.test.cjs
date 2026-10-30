@@ -16,11 +16,17 @@ test('public native slot registry stays in parity with canonical backend placeme
 });
 
 test('placementsForRoute normalizes routes and preserves distinct ordered slots', async () => {
-    const { placementsForRoute } = await load();
+    const { elementIdsForRoute, placementsForRoute } = await load();
     assert.deepEqual(placementsForRoute('category/all-products').map(item => item.buttonId), [5, 6, 7]);
     assert.deepEqual(placementsForRoute('/about').map(item => item.buttonId), [32, 33, 34]);
     assert.deepEqual(placementsForRoute('/rabbit-hole-forest').map(item => item.buttonId), [45, 50]);
     assert.equal(new Set(placementsForRoute('/about').map(item => item.elementId)).size, 3);
+    assert.deepEqual(elementIdsForRoute('/category/desk-workspace-fidgets'), [
+        'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
+    ]);
+    assert.deepEqual(elementIdsForRoute('/about'), [
+        'rabbitDiscovery32', 'rabbitDiscovery33', 'rabbitDiscovery34'
+    ]);
 });
 
 test('redistributed policy slots replace removed member routes', async () => {

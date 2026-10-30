@@ -40,3 +40,14 @@ export function placementsForRoute(route) {
     const normalized = value.startsWith('/') ? value : `/${value}`;
     return Object.freeze(NATIVE_DISCOVERY_SLOTS.filter(slot => slot.route === normalized));
 }
+
+export function elementIdsForRoute(route) {
+    const value = String(route || '');
+    const normalized = value.startsWith('/') ? value : `/${value}`;
+    if (normalized.startsWith('/category/')) {
+        return Object.freeze([
+            'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
+        ]);
+    }
+    return Object.freeze(placementsForRoute(normalized).map(slot => slot.elementId));
+}

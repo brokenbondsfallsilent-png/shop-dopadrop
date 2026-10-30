@@ -1,7 +1,7 @@
 import wixLocationFrontend from 'wix-location-frontend';
 import { authentication } from 'wix-members-frontend';
 import { beginButtonChallenge, findButton, getHuntState } from 'backend/rabbitHole.web';
-import { placementsForRoute } from 'public/rabbitPlacementSlots';
+import { elementIdsForRoute, placementsForRoute } from 'public/rabbitPlacementSlots';
 
 function currentRoute() {
     const path = Array.isArray(wixLocationFrontend.path)
@@ -21,21 +21,24 @@ function statusElementId(elementId) {
 export async function bindRabbitDiscovery($w, options = {}) {
     const route = currentRoute();
     const placements = placementsForRoute(route);
+    const physicalButtons = new Map(elementIdsForRoute(route).map(elementId => [
+        elementId, optionalElement($w, `#${elementId}`)
+    ]));
+    physicalButtons.forEach(button => button?.collapse());
     if (!placements.length) return { bound: false, reason: 'NO_DISCOVERY_PLACEMENTS', route };
 
     const slots = placements.map(placement => ({
         ...placement,
-        button: optionalElement($w, `#${placement.elementId}`),
+        button: physicalButtons.get(placement.elementId),
         status: optionalElement($w, `#${statusElementId(placement.elementId)}`)
     }));
-    slots.forEach(slot => slot.button?.collapse());
-    const missing = slots.find(slot => !slot.button);
-    if (missing) {
-        console.warn(`Rabbit discovery editor element is missing: #${missing.elementId}`);
+    const missingElementId = [...physicalButtons].find(([, button]) => !button)?.[0];
+    if (missingElementId) {
+        console.warn(`Rabbit discovery editor element is missing: #${missingElementId}`);
         return {
             bound: false,
             reason: 'EDITOR_ELEMENT_MISSING',
-            missingElementId: missing.elementId,
+            missingElementId,
             route
         };
     }

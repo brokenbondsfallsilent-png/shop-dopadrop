@@ -52,6 +52,9 @@ function baseDeps(overrides = {}) {
         wixLocationFrontend: { path: ['about'] },
         authentication: { loggedIn: async () => true, promptLogin: async () => {} },
         placementsForRoute: route => route === '/about' ? aboutSlots : [],
+        elementIdsForRoute: route => route === '/about'
+            ? aboutSlots.map(slot => slot.elementId)
+            : [],
         beginButtonChallenge: async buttonId => ({ buttonId, token: `token-${buttonId}` }),
         findButton: async buttonId => ({ newFind: true, found: buttonId - 31, required: 50 }),
         getHuntState: async () => ({ nextButtonId: 32, nextPage: '/about' }),
@@ -89,6 +92,69 @@ test('binder advances between distinct physical slots on the same route', async 
     assert.equal(elements['#rabbitDiscovery33'].collapsed, false);
     assert.equal(elements['#rabbitDiscovery33'].label, 'A tiny forest mark');
     assert.equal(elements['#rabbitDiscovery33'].accessibility.ariaLabel, 'Hidden forest discovery 33');
+});
+
+test('shared category template collapses every physical slot before binding', async () => {
+    const categorySlots = Object.freeze([
+        Object.freeze({ buttonId: 8, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryHeading' }),
+        Object.freeze({ buttonId: 9, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryGrid' })
+    ]);
+    const { elements, $w } = makeWixElements([
+        'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
+    ]);
+    const bind = loadBinder(baseDeps({
+        wixLocationFrontend: { path: ['category', 'desk-workspace-fidgets'] },
+        placementsForRoute: route => route === '/category/desk-workspace-fidgets' ? categorySlots : [],
+        elementIdsForRoute: route => route.startsWith('/category/')
+            ? ['rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter']
+            : [],
+        getHuntState: async () => ({ nextButtonId: 8, nextPage: '/category/desk-workspace-fidgets' })
+    }));
+
+    const result = await bind($w);
+    assert.equal(result.bound, true);
+    assert.equal(elements['#rabbitDiscoveryHeading'].collapsed, false);
+    assert.equal(elements['#rabbitDiscoveryGrid'].collapsed, true);
+    assert.equal(elements['#rabbitDiscoveryFooter'].collapsed, true);
+});
+
+test('unassigned category routes still collapse every shared template slot', async () => {
+    const { elements, $w } = makeWixElements([
+        'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
+    ]);
+    const bind = loadBinder(baseDeps({
+        wixLocationFrontend: { path: ['category', 'not-in-the-hunt'] },
+        placementsForRoute: () => [],
+        elementIdsForRoute: route => route.startsWith('/category/')
+            ? ['rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter']
+            : []
+    }));
+
+    const result = await bind($w);
+    assert.equal(result.bound, false);
+    assert.equal(result.reason, 'NO_DISCOVERY_PLACEMENTS');
+    assert.equal(Object.values(elements).every(element => element.collapsed), true);
+});
+
+test('missing shared category controls fail closed with the exact element ID', async () => {
+    const categorySlots = Object.freeze([
+        Object.freeze({ buttonId: 8, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryHeading' }),
+        Object.freeze({ buttonId: 9, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryGrid' })
+    ]);
+    const { elements, $w } = makeWixElements(['rabbitDiscoveryHeading', 'rabbitDiscoveryGrid']);
+    const bind = loadBinder(baseDeps({
+        wixLocationFrontend: { path: ['category', 'desk-workspace-fidgets'] },
+        placementsForRoute: () => categorySlots,
+        elementIdsForRoute: () => [
+            'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
+        ]
+    }));
+
+    const result = await bind($w);
+    assert.equal(result.bound, false);
+    assert.equal(result.reason, 'EDITOR_ELEMENT_MISSING');
+    assert.equal(result.missingElementId, 'rabbitDiscoveryFooter');
+    assert.equal(Object.values(elements).every(element => element.collapsed), true);
 });
 
 test('signed-out native routes keep every slot collapsed and do not open login', async () => {
