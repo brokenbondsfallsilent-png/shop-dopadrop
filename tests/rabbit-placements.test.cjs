@@ -85,8 +85,6 @@ test('native route templates bind placement-aware authenticated discovery contro
         'src/pages/Category Page.jqjf7.js', 'src/pages/About.h2wml.js',
         'src/pages/Contact.sdtlj.js', 'src/pages/Shipping policy.rrbon.js',
         'src/pages/Refund Policy.pf6as.js', 'src/pages/Privacy Policy.wcw8y.js',
-        'src/pages/Profile.nqcgq.js', 'src/pages/My Orders.ofgf2.js',
-        'src/pages/Account Settings.e3juj.js', 'src/pages/Notifications.u2bgt.js',
         'src/pages/Rabbit Hole Forest.l4tqi.js', 'src/pages/Rabbit Hole Daily.i6ju2.js',
         'src/pages/Blog.ejdl4.js', 'src/pages/GIFT CARD.t7j18.js',
         'src/pages/Accessibility Statement.ymbtc.js'
@@ -94,6 +92,13 @@ test('native route templates bind placement-aware authenticated discovery contro
     for (const controller of bindings) {
         assert.match(read(controller), /bindRabbitDiscovery/,
             `${controller} does not bind the discovery control`);
+    }
+    for (const removedController of [
+        'src/pages/Profile.nqcgq.js', 'src/pages/My Orders.ofgf2.js',
+        'src/pages/Account Settings.e3juj.js', 'src/pages/Notifications.u2bgt.js'
+    ]) {
+        assert.doesNotMatch(read(removedController), /bindRabbitDiscovery/,
+            `${removedController} still binds a redistributed discovery`);
     }
     const helper = read('src/public/rabbitDiscovery.js');
     assert.match(helper, /placementsForRoute/);
