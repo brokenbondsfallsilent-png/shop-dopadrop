@@ -14,7 +14,7 @@ function moduleInVm(path, bindings) {
     const source = read(path);
     const names = [...source.matchAll(/export (?:async )?(?:function|const) (\w+)/g)].map(m => m[1]);
     const context = vm.createContext({ ...bindings, console });
-    vm.runInContext(source.replace(/^import[\s\S]*?;\n/gm, '').replace(/export /g, '') + `\n;globalThis.api = {${names.join(',')}};`, context);
+    vm.runInContext(source.replace(/^import[\s\S]*?;\r?\n/gm, '').replace(/export /g, '') + `\n;globalThis.api = {${names.join(',')}};`, context);
     return context.api;
 }
 const core = moduleInVm('src/backend/rabbitCore.js', { ...content, ...details });
@@ -129,7 +129,7 @@ function caveController(b, loggedIn = true) {
     let options, ready, logins = 0; const destinations = [];
     let logged = loggedIn;
     const $w = { onReady: fn => { ready = fn; } };
-    const source = read('src/pages/Rabbit Hole Cave.zoimi.js').replace(/^import.*;\n/gm, '');
+    const source = read('src/pages/Rabbit Hole Cave.zoimi.js').replace(/^import.*;\r?\n/gm, '');
     vm.runInNewContext(source, {
         $w, ...b.api, caveSnapshot,
         authentication: { loggedIn: async () => logged, promptLogin: async () => { logins++; logged = true; }, onLogin: () => {} },
@@ -169,12 +169,23 @@ test('Cave sign-in is explicit, does not block onReady, and resumes saved dialog
 });
 
 function discoveryFixture({ logged = false, cancel = false, failState = false, failStateAfterFind = false } = {}) {
-    let click, loginCallback, reads = 0, challengeCalls = 0, finds = 0;
+    let loginCallback, reads = 0, challengeCalls = 0, finds = 0;
     let found = 4;
-    const button = { label: '', collapsed: false, accessibility: {}, collapse() { this.collapsed = true; }, expand() { this.collapsed = false; }, onClick(fn) { click = fn; } };
+    const makeButton = () => ({ label: '', collapsed: false, accessibility: {}, collapse() { this.collapsed = true; }, expand() { this.collapsed = false; }, onClick(fn) { this.click = fn; } });
+    const buttons = {
+        rabbitDiscoveryHeading: makeButton(),
+        rabbitDiscoveryGrid: makeButton(),
+        rabbitDiscoveryFooter: makeButton()
+    };
     const status = {};
     const api = moduleInVm('src/public/rabbitDiscovery.js', {
         wixLocationFrontend: { path: ['category', 'all-products'] },
+        placementsForRoute: () => [
+            { buttonId: 5, route: '/category/all-products', elementId: 'rabbitDiscoveryHeading' },
+            { buttonId: 6, route: '/category/all-products', elementId: 'rabbitDiscoveryGrid' },
+            { buttonId: 7, route: '/category/all-products', elementId: 'rabbitDiscoveryFooter' }
+        ],
+        elementIdsForRoute: () => Object.keys(buttons),
         authentication: {
             loggedIn: async () => logged,
             promptLogin: async () => { if (cancel) throw Error('LOGIN_CANCELLED'); logged = true; },
@@ -184,8 +195,9 @@ function discoveryFixture({ logged = false, cancel = false, failState = false, f
         beginButtonChallenge: async () => { challengeCalls++; return { token: 'offline-token' }; },
         findButton: async () => { finds++; found++; if (failStateAfterFind) failState = true; return { found, required: 50, caveUnlocked: false }; }
     });
-    const $w = id => id === '#rabbitDiscoveryButton' ? button : status;
-    return { api, $w, button, status, click: () => click(), login: () => { logged = true; return loginCallback(); }, counts: () => ({ reads, challengeCalls, finds }), recover: () => { failState = false; cancel = false; } };
+    const $w = id => buttons[id.slice(1)] || status;
+    const active = () => Object.values(buttons).find(button => !button.collapsed);
+    return { api, $w, button: buttons.rabbitDiscoveryHeading, buttons, active, status, click: () => active().click(), login: () => { logged = true; return loginCallback(); }, counts: () => ({ reads, challengeCalls, finds }), recover: () => { failState = false; cancel = false; } };
 }
 
 test('native discovery signs in before protected read and recovers cancellation without progression', async () => {
@@ -198,7 +210,7 @@ test('native discovery signs in before protected read and recovers cancellation 
     await Promise.all([f.click(), f.click()]);
     assert.equal(f.counts().challengeCalls, 1); assert.equal(f.counts().finds, 0);
     await f.click(); assert.equal(f.counts().finds, 1);
-    assert.equal(f.button.accessibility.ariaLabel, 'Hidden forest discovery 6');
+    assert.equal(f.active().accessibility.ariaLabel, 'Hidden forest discovery 6');
 });
 
 test('native discovery state failure exposes retry without silently hiding the control', async () => {
@@ -218,7 +230,7 @@ test('Forest and Daily resume exactly once after cancelled or successful member 
     for (const path of ['src/pages/Rabbit Hole Forest.l4tqi.js', 'src/pages/Rabbit Hole Daily.i6ju2.js']) {
         const ready = []; let loginHandler, binds = 0;
         const $w = { onReady: fn => ready.push(fn) };
-        const source = read(path).replace(/^import.*;\n/gm, '');
+        const source = read(path).replace(/^import.*;\r?\n/gm, '');
         vm.runInNewContext(source, {
             $w, console,
             authentication: { loggedIn: () => false, onLogin: fn => { loginHandler = fn; }, promptLogin: () => Promise.reject(Error('LOGIN_CANCELLED')) },
@@ -240,7 +252,7 @@ test('a saved discovery followed by failed refresh recovers from authoritative s
     await f.click(); await f.click();
     assert.equal(f.counts().finds, 1); assert.match(f.button.label, /Retry/);
     f.recover(); await f.click();
-    assert.equal(f.button.accessibility.ariaLabel, 'Hidden forest discovery 6');
+    assert.equal(f.active().accessibility.ariaLabel, 'Hidden forest discovery 6');
     assert.equal(f.counts().challengeCalls, 1);
     assert.equal(f.counts().finds, 1);
 });

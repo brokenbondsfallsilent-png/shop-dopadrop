@@ -5,6 +5,9 @@ const test = require('node:test');
 
 const root = path.resolve(__dirname, '..');
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const currentPageFiles = pageName => fs.readdirSync(path.join(root, 'src/pages'))
+    .filter(file => file.startsWith(`${pageName}.`) && file.endsWith('.js'))
+    .map(file => `src/pages/${file}`);
 
 test('homepage keeps obvious navigation while introducing the branded shopping identities', () => {
     const homepage = read('src/public/shop-dopadrop-home-current.html');
@@ -40,15 +43,25 @@ test('confirmed Wix pages use playful headings paired with an obvious purpose', 
         'src/pages/Contact.sdtlj.js': ['The Dopamine Hotline', 'Contact Customer Support'],
         'src/pages/Blog.ejdl4.js': ['The Brain Dump', 'Stories, Guides &amp; Discoveries'],
         'src/pages/GIFT CARD.t7j18.js': ['Gift a Little Dopamine', 'Shop Gift Cards'],
-        'src/pages/Events.w9owy.js': ['The Chaos Calendar', 'Events &amp; Community Activities'],
         'src/pages/Cart Page.low20.js': ['The Loot Cart', 'Your Cart'],
-        'src/pages/Search Results.ziu7d.js': ['The Treasure Hunt', 'Search Results'],
         'src/pages/My Orders.ofgf2.js': ['My Dopamine Deliveries', 'My Orders'],
         'src/pages/Account Settings.e3juj.js': ['My Little Corner of Chaos', 'Account Settings']
     };
     for (const [file, phrases] of Object.entries(expectations)) {
         const source = read(file);
         phrases.forEach(phrase => assert.match(source, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `${file} should contain ${phrase}`));
+    }
+
+    for (const file of currentPageFiles('Events')) {
+        const source = read(file);
+        for (const phrase of ['The Chaos Calendar', 'Events &amp; Community Activities']) {
+            assert.match(source, new RegExp(phrase), `${file} should contain ${phrase}`);
+        }
+    }
+    const searchFiles = currentPageFiles('Search');
+    assert.equal(searchFiles.length, 1, 'expected one current Wix Search controller');
+    for (const phrase of ['The Treasure Hunt', 'Search Results']) {
+        assert.match(read(searchFiles[0]), new RegExp(phrase), `${searchFiles[0]} should contain ${phrase}`);
     }
 });
 

@@ -232,6 +232,47 @@ test('source and served mobile decoration bands clip transformed artwork', () =>
     assert.match(servedSource, /\.art-sprinkles\{[^}]*overflow:hidden/);
 });
 
+test('homepage discoveries remain reliable 44px touch targets on mobile', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /\.rabbit-secret\{[^}]*touch-action:manipulation/);
+        assert.match(html, /@media\(max-width:600px\)\{\.rabbit-secret\{[^}]*min-width:44px[^}]*min-height:44px/);
+    }
+});
+
+test('homepage discovery bands stay above decorative and text layers without leaving their bands', () => {
+    const source = read('src/public/shop-dopadrop-home-current.html');
+    const servedSource = read('docs/index.html');
+
+    for (const html of [source, servedSource]) {
+        assert.match(html, /\.art-sprinkles\{[^}]*overflow:hidden[^}]*isolation:isolate[^}]*z-index:2/);
+        assert.match(html, /\.rabbit-secret\{[^}]*z-index:3/);
+    }
+});
+
+test('homepage discoveries occupy four explicit canonical section bands', () => {
+    for (const relativePath of ['src/public/shop-dopadrop-home-current.html', 'docs/index.html']) {
+        const html = read(relativePath);
+        const expectedSections = [
+            ['top', 1],
+            ['products', 2],
+            ['collections', 3],
+            ['about', 4]
+        ];
+        for (const [sectionId, rabbitId] of expectedSections) {
+            const section = html.match(new RegExp(`<section[^>]*id="${sectionId}"[\\s\\S]*?<\\/section>`))?.[0] || '';
+            assert.match(section, new RegExp(`data-rabbit-id="${rabbitId}"`), `${relativePath} is missing discovery ${rabbitId} in ${sectionId}`);
+        }
+        for (let rabbitId = 1; rabbitId <= 4; rabbitId += 1) {
+            assert.equal((html.match(new RegExp(`data-rabbit-id="${rabbitId}"`, 'g')) || []).length, 1);
+        }
+        assert.match(html, /querySelectorAll\('\[data-rabbit-id\]'\)/);
+        assert.doesNotMatch(html, /querySelectorAll\('\.art-sprinkles \.float-piece'\)\]\.slice\(0,4\)/);
+    }
+});
+
 test('storefront route buttons have real destinations outside the Wix iframe', () => {
     const source = read('src/public/shop-dopadrop-home-current.html');
     const servedSource = read('docs/index.html');
