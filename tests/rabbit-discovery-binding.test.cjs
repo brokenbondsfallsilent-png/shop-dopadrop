@@ -30,6 +30,15 @@ function makeButton() {
     };
 }
 
+function makeImageButton() {
+    const element = makeButton();
+    delete element.label;
+    Object.defineProperty(element, 'label', {
+        set() { throw new Error('Image elements do not support button labels'); }
+    });
+    return element;
+}
+
 function makeWixElements(ids) {
     const elements = Object.fromEntries(ids.map(id => [`#${id}`, makeButton()]));
     return {
@@ -94,6 +103,25 @@ test('binder advances between distinct physical slots on the same route', async 
     assert.equal(elements['#rabbitDiscovery33'].accessibility.ariaLabel, 'Hidden forest discovery 33');
 });
 
+test('binder activates clickable image elements without writing a button label', async () => {
+    const image = makeImageButton();
+    const elements = { '#rabbitDiscovery32': image };
+    const bind = loadBinder(baseDeps({
+        placementsForRoute: route => route === '/about' ? [aboutSlots[0]] : [],
+        elementIdsForRoute: route => route === '/about' ? ['rabbitDiscovery32'] : []
+    }));
+
+    const result = await bind(selector => {
+        if (!(selector in elements)) throw new Error(`missing ${selector}`);
+        return elements[selector];
+    });
+
+    assert.equal(result.bound, true);
+    assert.equal(image.collapsed, false);
+    assert.equal(image.accessibility.ariaLabel, 'Hidden forest discovery 32');
+    assert.equal(typeof image.clickHandler, 'function');
+});
+
 test('shared category template collapses every physical slot before binding', async () => {
     const categorySlots = Object.freeze([
         Object.freeze({ buttonId: 8, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryHeading' }),
@@ -136,7 +164,7 @@ test('unassigned category routes still collapse every shared template slot', asy
     assert.equal(Object.values(elements).every(element => element.collapsed), true);
 });
 
-test('missing shared category controls fail closed with the exact element ID', async () => {
+test('a missing future category control does not disable the currently placed discovery', async () => {
     const categorySlots = Object.freeze([
         Object.freeze({ buttonId: 8, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryHeading' }),
         Object.freeze({ buttonId: 9, route: '/category/desk-workspace-fidgets', elementId: 'rabbitDiscoveryGrid' })
@@ -147,14 +175,18 @@ test('missing shared category controls fail closed with the exact element ID', a
         placementsForRoute: () => categorySlots,
         elementIdsForRoute: () => [
             'rabbitDiscoveryHeading', 'rabbitDiscoveryGrid', 'rabbitDiscoveryFooter'
-        ]
+        ],
+        getHuntState: async () => ({
+            nextButtonId: 8,
+            nextPage: '/category/desk-workspace-fidgets'
+        })
     }));
 
     const result = await bind($w);
-    assert.equal(result.bound, false);
-    assert.equal(result.reason, 'EDITOR_ELEMENT_MISSING');
-    assert.equal(result.missingElementId, 'rabbitDiscoveryFooter');
-    assert.equal(Object.values(elements).every(element => element.collapsed), true);
+    assert.equal(result.bound, true);
+    assert.equal(result.buttonId, 8);
+    assert.equal(elements['#rabbitDiscoveryHeading'].collapsed, false);
+    assert.equal(elements['#rabbitDiscoveryGrid'].collapsed, true);
 });
 
 test('signed-out native routes keep every slot collapsed and do not open login', async () => {
@@ -172,13 +204,24 @@ test('signed-out native routes keep every slot collapsed and do not open login',
     assert.equal(loginPrompts, 0);
 });
 
-test('missing page-local controls fail closed with the exact editor ID', async () => {
-    const { elements, $w } = makeWixElements(['rabbitDiscovery32', 'rabbitDiscovery34']);
+test('missing current page-local control fails closed with the exact editor ID', async () => {
+    const { elements, $w } = makeWixElements(['rabbitDiscovery33', 'rabbitDiscovery34']);
     const bind = loadBinder(baseDeps());
 
     const result = await bind($w);
     assert.equal(result.bound, false);
     assert.equal(result.reason, 'EDITOR_ELEMENT_MISSING');
-    assert.equal(result.missingElementId, 'rabbitDiscovery33');
+    assert.equal(result.missingElementId, 'rabbitDiscovery32');
     assert.equal(Object.values(elements).every(element => element.collapsed), true);
+});
+
+test('a missing future page-local control does not disable the current discovery', async () => {
+    const { elements, $w } = makeWixElements(['rabbitDiscovery32', 'rabbitDiscovery34']);
+    const bind = loadBinder(baseDeps());
+
+    const result = await bind($w);
+    assert.equal(result.bound, true);
+    assert.equal(result.buttonId, 32);
+    assert.equal(elements['#rabbitDiscovery32'].collapsed, false);
+    assert.equal(elements['#rabbitDiscovery34'].collapsed, true);
 });

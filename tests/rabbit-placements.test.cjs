@@ -111,6 +111,12 @@ test('native route templates bind placement-aware authenticated discovery contro
     assert.match(helper, /activate\(nextState\)/);
     assert.match(helper, /options\.onFound\(result, nextState\)/);
     assert.doesNotMatch(helper, /resetHuntState|claimReward/);
+
+    const categoryController = read('src/pages/Category Page.jqjf7.js');
+    assert.match(categoryController, /#rabbitDiscoveryButton/,
+        'Category template does not collapse the obsolete legacy discovery control');
+    assert.match(categoryController, /\.collapse\(\)/,
+        'Category template leaves the obsolete legacy discovery control visible');
 });
 
 test('the homepage embed owns only discoveries one through four', () => {

@@ -32,20 +32,9 @@ export async function bindRabbitDiscovery($w, options = {}) {
         button: physicalButtons.get(placement.elementId),
         status: optionalElement($w, `#${statusElementId(placement.elementId)}`)
     }));
-    const missingElementId = [...physicalButtons].find(([, button]) => !button)?.[0];
-    if (missingElementId) {
-        console.warn(`Rabbit discovery editor element is missing: #${missingElementId}`);
-        return {
-            bound: false,
-            reason: 'EDITOR_ELEMENT_MISSING',
-            missingElementId,
-            route
-        };
-    }
-
     const challenges = new Map();
     let activeButtonId = null;
-    const collapseAll = () => slots.forEach(slot => slot.button.collapse());
+    const collapseAll = () => slots.forEach(slot => slot.button?.collapse());
     const setStatus = (slot, message) => {
         if (slot.status) slot.status.text = message;
     };
@@ -54,9 +43,14 @@ export async function bindRabbitDiscovery($w, options = {}) {
         activeButtonId = null;
         if (!nextState?.nextButtonId || nextState.nextPage !== route) return null;
         const slot = slots.find(candidate => candidate.buttonId === nextState.nextButtonId);
-        if (!slot) return null;
+        if (!slot?.button) {
+            if (slot) console.warn(`Rabbit discovery editor element is missing: #${slot.elementId}`);
+            return null;
+        }
         activeButtonId = slot.buttonId;
-        slot.button.label = 'A tiny forest mark';
+        if (typeof slot.button.label === 'string') {
+            slot.button.label = 'A tiny forest mark';
+        }
         if (slot.button.accessibility) {
             slot.button.accessibility.ariaLabel = `Hidden forest discovery ${slot.buttonId}`;
         }
@@ -64,7 +58,7 @@ export async function bindRabbitDiscovery($w, options = {}) {
         return slot;
     };
 
-    slots.forEach(slot => {
+    slots.filter(slot => slot.button).forEach(slot => {
         slot.button.onClick(async () => {
             if (activeButtonId !== slot.buttonId || !(await authentication.loggedIn())) return;
             try {
@@ -101,6 +95,18 @@ export async function bindRabbitDiscovery($w, options = {}) {
         return { bound: false, reason: 'STATE_UNAVAILABLE', route };
     }
 
+    const requiredSlot = state?.nextPage === route
+        ? slots.find(slot => slot.buttonId === state.nextButtonId)
+        : null;
+    if (requiredSlot && !requiredSlot.button) {
+        console.warn(`Rabbit discovery editor element is missing: #${requiredSlot.elementId}`);
+        return {
+            bound: false,
+            reason: 'EDITOR_ELEMENT_MISSING',
+            missingElementId: requiredSlot.elementId,
+            route
+        };
+    }
     const activeSlot = activate(state);
     if (!activeSlot) return { bound: false, reason: 'NOT_ASSIGNED_HERE', route };
     return { bound: true, buttonId: activeSlot.buttonId, route };
