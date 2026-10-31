@@ -11,7 +11,8 @@ export const HUNT_STAGES = GUARDIAN_MILESTONES;
 export const CAMPAIGN_START = '2026-10-30';
 
 const placements = [];
-const place = (route, surface, anchor, editorElementId = 'rabbitDiscoveryButton') => {
+const place = (route, surface, anchor, editorElementId) => {
+    if (!editorElementId) throw new Error('HUNT_EDITOR_ELEMENT_ID_REQUIRED');
     placements.push(Object.freeze({
         buttonId: placements.length + 1,
         route,
@@ -26,34 +27,41 @@ const place = (route, surface, anchor, editorElementId = 'rabbitDiscoveryButton'
 // contract: source can bind them, but only Wix Studio can place them on canvas.
 ['hero artwork', 'featured products', 'collection trail', 'founder invitation']
     .forEach((anchor, index) => place('/', 'home', anchor, `home-sprinkle-${index + 1}`));
-['shop-all heading', 'catalogue midpoint', 'catalogue footer']
-    .forEach(anchor => place('/category/all-products', 'shop-all', anchor));
+[
+    ['shop-all heading', 'rabbitDiscoveryHeading'],
+    ['catalogue midpoint', 'rabbitDiscoveryGrid'],
+    ['catalogue footer', 'rabbitDiscoveryFooter']
+].forEach(([anchor, editorElementId]) => place('/category/all-products', 'shop-all', anchor, editorElementId));
 [
     'desk-workspace-fidgets', 'hand-fidgets-spinners', 'sensory-rings-chains-wearables',
     'chew-oral-sensory', 'tactile-textured-sensory', 'weighted-deep-pressure',
     'visual-light-stimulation', 'auditory-rhythm-tools', 'focus-calm-tools',
     'stim-toys-squishies', 'sensory-kits-bundles', 'movement-balance'
 ].forEach(slug => {
-    place(`/category/${slug}`, 'collection', `${slug} heading`);
-    place(`/category/${slug}`, 'collection', `${slug} product grid`);
+    place(`/category/${slug}`, 'collection', `${slug} heading`, 'rabbitDiscoveryHeading');
+    place(`/category/${slug}`, 'collection', `${slug} product grid`, 'rabbitDiscoveryGrid');
 });
+const placeStatic = (route, surface, anchor) => {
+    const buttonId = placements.length + 1;
+    place(route, surface, anchor, `rabbitDiscovery${buttonId}`);
+};
 ['founder story opening', 'origin story midpoint', 'welcome home sign-off']
-    .forEach(anchor => place('/about', 'about', anchor));
+    .forEach(anchor => placeStatic('/about', 'about', anchor));
 ['support introduction', 'help choosing section', 'contact sign-off']
-    .forEach(anchor => place('/contact', 'support', anchor));
-place('/shipping-policy', 'policy', 'tracking section');
-place('/refund-policy', 'policy', 'refunds section');
-place('/privacy-policy', 'policy', 'privacy promise');
-place('/profile/my/profile', 'member', 'profile summary');
-place('/my-orders', 'member', 'orders summary');
-place('/account-settings', 'member', 'account settings footer');
-place('/notifications', 'member', 'notifications footer');
-place('/rabbit-hole-forest', 'adventure', 'forest path');
-place('/rabbit-hole-daily', 'adventure', 'daily chronicle');
-place('/blog', 'adventure', 'brain dump archive');
-place('/gift-card', 'adventure', 'gift card artwork');
-place('/accessibility-statement', 'adventure', 'accessibility promise');
-place('/rabbit-hole-forest', 'adventure', 'Tanglebright threshold');
+    .forEach(anchor => placeStatic('/contact', 'support', anchor));
+placeStatic('/shipping-policy', 'policy', 'tracking section');
+placeStatic('/refund-policy', 'policy', 'refunds section');
+placeStatic('/privacy-policy', 'policy', 'privacy promise');
+placeStatic('/shipping-policy', 'policy', 'delivery help footer');
+placeStatic('/refund-policy', 'policy', 'returns help footer');
+placeStatic('/privacy-policy', 'policy', 'data controls footer');
+placeStatic('/accessibility-statement', 'adventure', 'assistance footer');
+placeStatic('/rabbit-hole-forest', 'adventure', 'forest path');
+placeStatic('/rabbit-hole-daily', 'adventure', 'daily chronicle');
+placeStatic('/blog', 'adventure', 'brain dump archive');
+placeStatic('/gift-card', 'adventure', 'gift card artwork');
+placeStatic('/accessibility-statement', 'adventure', 'accessibility promise');
+placeStatic('/rabbit-hole-forest', 'adventure', 'Tanglebright threshold');
 
 if (placements.length !== TOTAL_BUTTONS) throw new Error('HUNT_PLACEMENT_COUNT_INVALID');
 export const HUNT_PLACEMENTS = Object.freeze(placements);
@@ -68,7 +76,7 @@ export const LOOTGREM_DIALOGUE = {
         ]
     },
     who: {
-        text: '“I am Tanglebright, the Loot Seeker. I keep the final choice: five hundred loyalty points, or the checkout code LOOTGREM.”',
+        text: '“I am Tanglebright, the Loot Seeker. I keep the final choice: five hundred loyalty points, or a checkout reward.”',
         choices: [{ id: 'reward', text: 'And my treasure?' }]
     },
     reward: {

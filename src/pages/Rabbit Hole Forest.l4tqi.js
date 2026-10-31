@@ -9,11 +9,14 @@ $w.onReady(() => bindRabbitDiscovery($w, {
     onFound: () => reloadForestQuestion()
 }));
 
-$w.onReady(async () => {
-    if (!(await authentication.loggedIn())) {
-        await authentication.promptLogin();
-        return;
-    }
+$w.onReady(function () {
+    let initialized = false;
+    const initialize = () => {
+        if (initialized) {
+            reloadForestQuestion();
+            return;
+        }
+        initialized = true;
 
     let stage;
     let choiceMap = new Map();
@@ -91,5 +94,12 @@ $w.onReady(async () => {
         })
     });
     reloadForestQuestion = questionView.reload;
+    };
+    // Do not await the login modal from onReady, and continue after login.
+    authentication.onLogin(initialize);
+    if (authentication.loggedIn()) initialize();
+    else authentication.promptLogin().then(initialize).catch(() => {
+        // The discovery button and shared member gem can retry a cancelled login.
+    });
 });
 

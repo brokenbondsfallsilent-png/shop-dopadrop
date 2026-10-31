@@ -5,11 +5,16 @@ import { bindRabbitQuestionView } from 'public/rabbitQuestionBridge';
 
 $w.onReady(() => bindRabbitDiscovery($w));
 
-$w.onReady(async () => {
-    if (!(await authentication.loggedIn())) {
-        await authentication.promptLogin();
-        return;
-    }
+let reloadDailyQuestion = async () => {};
+
+$w.onReady(function () {
+    let initialized = false;
+    const initialize = () => {
+        if (initialized) {
+            reloadDailyQuestion();
+            return;
+        }
+        initialized = true;
 
     let content;
     let entry;
@@ -54,7 +59,7 @@ $w.onReady(async () => {
         return snapshot();
     };
 
-    bindRabbitQuestionView($w, {
+    const questionView = bindRabbitQuestionView($w, {
         load,
         submit: async action => {
             const answer = choiceMap.get(action.choiceId);
@@ -73,6 +78,14 @@ $w.onReady(async () => {
             });
             return snapshot({ kind: 'error', message: 'The chronicle could not be checked. Please try again.' });
         }
+    });
+    reloadDailyQuestion = questionView.reload;
+    };
+    // Do not await the login modal from onReady, and continue after login.
+    authentication.onLogin(initialize);
+    if (authentication.loggedIn()) initialize();
+    else authentication.promptLogin().then(initialize).catch(() => {
+        // The discovery button and shared member gem can retry a cancelled login.
     });
 });
 

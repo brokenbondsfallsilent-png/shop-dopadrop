@@ -60,28 +60,23 @@ test('Forest refreshes the authoritative stage after success or stale action', (
     assert.match(source, /reloadForestQuestion\s*=\s*questionView\.reload/);
 });
 
-test('Cave renders authoritative dialogue and removes generated button IDs', () => {
+test('Cave uses authenticated backend-only confirmation and the existing question protocol', () => {
     const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
-
-    assert.doesNotMatch(source, /comp-mvl0ugrl|comp-mvl0uqjc|comp-mvl0v0ka/);
-    assert.doesNotMatch(source, /claimReward/);
     assert.match(source, /bindRabbitQuestionView/);
     assert.match(source, /enterCave\(\)/);
-    assert.match(source, /result\.dialogue/);
-    assert.match(source, /dialogue\?\.choices[\s\S]*\.map/);
-    assert.match(source, /chooseLootgrem\(currentNode,\s*action\.choiceId\)/);
-    assert.match(source, /guardianKey:\s*'tanglebright'/);
+    assert.match(source, /claimReward, claimCheckoutCode/);
+    assert.match(source, /shownChoices\.has\(action.choiceId\)/);
+    assert.match(source, /caveSnapshot/);
+    assert.doesNotMatch(source, /accounts\.earnPoints|resetHuntState|comp-mvl0ugrl/);
 });
 
-test('Cave maps next dialogue, terminal choices and locked access safely', () => {
+test('Cave preserves returned dialogue state and offers safe retry/change/postpone', () => {
     const source = read('src/pages/Rabbit Hole Cave.zoimi.js');
-
-    assert.match(source, /currentNode\s*=\s*result\.next/);
+    assert.match(source, /result\.lootgrem\?\.node/);
     assert.match(source, /result\.dialogue/);
-    assert.match(source, /result\.next\s*===\s*'claim'/);
-    assert.match(source, /result\.next\s*===\s*'code'/);
-    assert.match(source, /rewardIssuanceEnabled/);
+    assert.match(source, /confirm_reward/);
+    assert.match(source, /change_reward/);
+    assert.match(source, /postpone_reward/);
+    assert.match(source, /status === 'disabled'/);
     assert.match(source, /CAVE_LOCKED/);
-    assert.match(source, /kind:\s*'locked'/);
-    assert.match(source, /choices:\s*\[\]/);
 });

@@ -62,7 +62,10 @@ $w.onReady(function () {
         try {
             if (data.action === 'sign-in') {
                 await authentication.promptLogin();
-                reply(true, await getMyRabbitDashboard());
+                rabbitWidget.postMessage({
+                    type: 'RABBIT_WIDGET_RESULT', action: 'dashboard', ok: true,
+                    payload: await getMyRabbitDashboard()
+                });
                 return;
             }
             if (!(await authentication.loggedIn())) throw new Error('MEMBER_LOGIN_REQUIRED');
